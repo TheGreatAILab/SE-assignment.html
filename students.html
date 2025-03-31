@@ -1,3 +1,11 @@
+<!--
+ * @Author: Ethan-Zhengsy Ethan1653845683@outlook.com
+ * @Date: 2025-03-31 12:44:55
+ * @LastEditors: Ethan-Zhengsy Ethan1653845683@outlook.com
+ * @LastEditTime: 2025-03-31 14:39:15
+ * @FilePath: \GithubFileClone\TmpClone1\SE-assignment.html\students.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,9 +37,9 @@
   <p id="result"></p>
   <script>
     fetch('students.json')
-  .then(response => response.json())
-  .then(data => {
-    students = data;
+    .then(response => response.json())
+    .then(data => {
+      const students = data;
   });
   </script>
 </body>
