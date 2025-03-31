@@ -23,9 +23,7 @@
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
+  <button onclick="pickRandom()">点名</button>
   <p id="result"></p>
   <script>
     const students = ["谢慧豪",
@@ -154,6 +152,21 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+
+    let remainingStudents = [...students];
+    
+    function pickRandom() {
+      if (remainingStudents.length === 0) {
+        remainingStudents = [...students];
+        document.getElementById('result').innerText += " (名单已重置)";
+      }
+      
+      const picked = remainingStudents.splice(
+        Math.floor(Math.random() * remainingStudents.length), 1
+      )[0];
+      
+      document.getElementById('result').innerText = picked;
+    }
   </script>
 </body>
 </html>
