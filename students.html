@@ -13,20 +13,42 @@
       margin: 0;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      padding: 0.8rem 1.5rem;
+      margin: 0.3rem;
     }
     #result {
       font-size: 2rem;
-      margin-top: 1rem;
+      margin: 1rem;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #remaining {
+      margin: 1rem;
+      font-size: 1.2rem;
+    }
+    .status-btns {
+      display: flex;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <div class="controls">
+    <button id="callBtn">点名</button>
+    <div class="status-btns">
+      <button id="presentBtn" disabled>到</button>
+      <button id="absentBtn" disabled>未到</button>
+    </div>
+    <button id="exportBtn">导出Excel</button>
+    <button id="resetBtn" style="display:none;">重新开始</button>
+    <div id="remaining"></div>
+  </div>
+  <div id="result"></div>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
   <script>
     const students = ["谢慧豪",
 "肖金洋",
@@ -154,6 +176,93 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    let remainingStudents = [...students];
+    let lastStudent = "";
+    let currentStudent = "";
+    let records = students.map(name => ({name, status: "未点名"}));
+    
+    const callBtn = document.getElementById('callBtn');
+    const presentBtn = document.getElementById('presentBtn');
+    const absentBtn = document.getElementById('absentBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultDisplay = document.getElementById('result');
+    const remainingDisplay = document.getElementById('remaining');
+    
+    updateRemainingCount();
+    
+    callBtn.addEventListener('click', randomStudent);
+    presentBtn.addEventListener('click', () => markAttendance('到'));
+    absentBtn.addEventListener('click', () => markAttendance('未到'));
+    exportBtn.addEventListener('click', exportExcel);
+    resetBtn.addEventListener('click', resetSelection);
+    
+    function randomStudent() {
+      if (remainingStudents.length === 0) {
+        resultDisplay.textContent = "已完成点名";
+        callBtn.style.display = 'none';
+        resetBtn.style.display = 'block';
+        return;
+      }
+      
+      let randomIndex = Math.floor(Math.random() * remainingStudents.length);
+      currentStudent = remainingStudents[randomIndex];
+      resultDisplay.textContent = currentStudent;
+      
+      presentBtn.disabled = false;
+      absentBtn.disabled = false;
+    }
+    
+    function markAttendance(status) {
+      const record = records.find(r => r.name === currentStudent);
+      if (record) {
+        record.status = status;
+        remainingStudents = remainingStudents.filter(name => name !== currentStudent);
+        updateRemainingCount();
+        
+        currentStudent = "";
+        resultDisplay.textContent = "请点击点名";
+        presentBtn.disabled = true;
+        absentBtn.disabled = true;
+        
+        if (remainingStudents.length === 0) {
+          resultDisplay.textContent = "已完成点名";
+          callBtn.style.display = 'none';
+          resetBtn.style.display = 'block';
+        }
+      }
+    }
+    
+    function exportExcel() {
+      // 只筛选出已标记"到"或"未到"的记录
+      const filteredRecords = records.filter(record => record.status === "到" || record.status === "未到");
+            
+      const data = filteredRecords.map(record => [record.name, record.status]);
+      data.unshift(["姓名", "状态"]);
+      
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "点名记录");
+      
+      XLSX.writeFile(wb, "点名记录.xlsx");
+    }
+    
+    function resetSelection() {
+      remainingStudents = [...students];
+      records = students.map(name => ({name, status: "未点名"}));
+      currentStudent = "";
+      lastStudent = "";
+      resultDisplay.textContent = "";
+      callBtn.style.display = 'block';
+      resetBtn.style.display = 'none';
+      presentBtn.disabled = true;
+      absentBtn.disabled = true;
+      updateRemainingCount();
+    }
+    
+    function updateRemainingCount() {
+      remainingDisplay.textContent = `剩余: ${remainingStudents.length}/${students.length}`;
+    }
   </script>
 </body>
 </html>
