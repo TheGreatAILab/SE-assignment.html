@@ -23,7 +23,9 @@
   </style>
 </head>
 <body>
-  <button onclick="pickRandom()">点名</button>
+  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+    点名
+  </button>
   <p id="result"></p>
   <script>
     const students = ["谢慧豪",
@@ -152,54 +154,6 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
-
-    let remainingStudents = [...students]; // 创建副本
-    let isRolling = false; // 动画状态标志，防止重复点击
-    
-    function pickRandom() {
-      if (isRolling) return;
-      // 禁用按钮，设置动画状态标志为true
-      const btn = document.querySelector('button'); //获取页面第一个按钮元素
-      btn.disabled = true;
-      isRolling = true;
-      
-      // 清空结果
-      document.getElementById('result').innerText = ""; 
-      /*getElementById()：通过ID获取HTML元素；innerText：操作元素的文本内容*/
-      
-      // 模拟滚动效果
-      let counter = 0; // 记录动画帧数
-      // 每100ms进行回调（10帧/秒）
-      const rollInterval = setInterval(() => { //定时重复执行
-        // 单帧动画：抽取随机名字，更新显示内容，计数器加一
-        const tempName = students[Math.floor(Math.random() * students.length)];
-        /*Math.random()：生成0-1之间的随机数
-        Math.floor()：向下取整，确保是有效索引
-        */
-        document.getElementById('result').innerText = tempName;
-        counter++;
-        
-        if (counter > 15) {
-          clearInterval(rollInterval);//停止计时器
-          
-          // 名字重复检查
-          if (remainingStudents.length === 0) {
-            remainingStudents = [...students];
-            document.getElementById('result').innerText += " (名单已重置)";
-          }
-          // 从名单随机抽取并移除
-          //array.splice(起始索引, 删除数量)：修改原数组并返回被删元素
-          const picked = remainingStudents.splice(
-            Math.floor(Math.random() * remainingStudents.length), 1
-          )[0];
-
-          //显示最终名字，恢复按钮状态，恢复动画状态
-          document.getElementById('result').innerText = picked;
-          btn.disabled = false;
-          isRolling = false;
-        }
-      }, 100);
-    }
   </script>
 </body>
 </html>
