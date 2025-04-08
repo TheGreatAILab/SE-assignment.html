@@ -11,21 +11,61 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      font-family: 'Microsoft YaHei', sans-serif;
+      background-color: #f5f5f5;
     }
     button {
       font-size: 2rem;
       padding: 1rem 2rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    button.stopping {
+      background-color: #f44336; /* 停止点名按钮为红色 */
+    }
+    button.stopping:hover {
+      background-color: #d32f2f; /* 停止点名按钮的悬停颜色 */
     }
     #result {
-      font-size: 2rem;
-      margin-top: 1rem;
+      font-size: 3rem;
+      margin-top: 2rem;
+      min-height: 4rem;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+    .rolling {
+      animation: roll 0.1s linear infinite;
+    }
+    @keyframes roll {
+      0% {
+        transform: translateY(0);
+        opacity: 0.2;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 0.2;
+      }
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
+  <button id="rollButton">开始点名</button>
   <p id="result"></p>
   <script>
     const students = ["谢慧豪",
@@ -154,6 +194,38 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    
+    const rollButton = document.getElementById('rollButton');
+    const resultElement = document.getElementById('result');
+    
+    let isRolling = false;
+    let interval;
+    
+    rollButton.addEventListener('click', () => {
+      if (!isRolling) {
+
+        isRolling = true;
+        rollButton.innerText = "停止点名";
+        rollButton.classList.add('stopping'); // 添加停止样式类
+        
+        resultElement.classList.add('rolling');
+        
+        interval = setInterval(() => {
+          const randomStudent = students[Math.floor(Math.random() * students.length)];
+          resultElement.innerText = randomStudent;
+        }, 30); 
+        
+      } else {
+
+        isRolling = false;
+        rollButton.innerText = "开始点名";
+        rollButton.classList.remove('stopping'); 
+        
+        clearInterval(interval);
+        
+        resultElement.classList.remove('rolling');
+      }
+    });
   </script>
 </body>
 </html>
