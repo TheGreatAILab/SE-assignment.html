@@ -2,33 +2,111 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>两阶段随机点名</title>
   <style>
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .control-panel {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
     }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
+    button:hover {
+      background-color: #2980b9;
+    }
+    #phase2Btn {
+      background-color: #2ecc71;
+    }
+    #phase2Btn:hover {
+      background-color: #27ae60;
+    }
+    input {
+      padding: 8px;
+      width: 60px;
+      text-align: center;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .result-area {
+      margin-top: 20px;
+    }
+    .result-box {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: white;
+    }
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 10px 0;
+      min-height: 20px;
+    }
+    .student-list {
+      line-height: 1.6;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <h1>两阶段随机点名系统</h1>
+  
+  <div class="control-panel">
+    <div>
+      <label for="count">最终选择人数：</label>
+      <input type="number" id="count" min="1" value="3">
+    </div>
+    
+    <div class="error" id="errorMsg"></div>
+    
+    <div>
+      <button id="phase1Btn" onclick="startPhase1()">第一阶段选择 (n+10人)</button>
+      <button id="phase2Btn" onclick="startPhase2()">第二阶段选择 (n人)</button>
+      <button onclick="resetSelection()" style="background-color: #e74c3c;">重置</button>
+    </div>
+  </div>
+  
+  <div class="result-area">
+    <div class="result-box">
+      <h2>第一阶段：候选池</h2>
+      <p>从全班同学中随机选择 (最终人数+10) 作为候选</p>
+      <div id="phase1Result" class="student-list"></div>
+    </div>
+    
+    <div class="result-box">
+      <h2>第二阶段：最终选择</h2>
+      <p>从候选池中随机选择最终人数</p>
+      <div id="phase2Result" class="student-list"></div>
+    </div>
+  </div>
+
   <script>
-    const students = ["谢慧豪",
+    // 正确定义的学生数组（所有字符串正确闭合）
+    const allStudents = [
+     "谢慧豪",
 "肖金洋",
 "廖嘉辉",
 "李锐钊",
@@ -105,7 +183,7 @@
 "张逸",
 "张颖琳",
 "张宇然",
-"23336316",
+"张玉瑶",
 "张誉方",
 "张越",
 "赵施琦",
@@ -153,7 +231,94 @@
 "龙宇海",
 "卢晓玲",
 "吕振宁",
-"郭靖宇"];
+"郭靖宇"
+    ];
+    
+    let candidatePool = [];
+    let finalSelection = [];
+    
+    function startPhase1() {
+      const errorElement = document.getElementById('errorMsg');
+      errorElement.innerText = '';
+      
+      const finalCount = parseInt(document.getElementById('count').value);
+      const phase1Count = finalCount + 10;
+      
+      // 输入验证
+      if (isNaN(finalCount)) {
+        errorElement.innerText = "请输入有效数字";
+        return;
+      }
+      
+      if (finalCount < 1) {
+        errorElement.innerText = "至少选择1人";
+        return;
+      }
+      
+      if (phase1Count > allStudents.length) {
+        errorElement.innerText = `班级只有 ${allStudents.length} 人，无法选择 ${phase1Count} 人`;
+        return;
+      }
+      
+      // 随机选择候选池
+      candidatePool = getRandomSubset(allStudents, phase1Count);
+      document.getElementById('phase1Result').innerHTML = 
+        `<strong>${phase1Count}人候选名单：</strong><br>` +
+        candidatePool.join("、");
+      
+      // 清空之前的结果
+      document.getElementById('phase2Result').innerText = "";
+      document.getElementById('errorMsg').innerText = "";
+    }
+    
+    function startPhase2() {
+      const errorElement = document.getElementById('errorMsg');
+      errorElement.innerText = '';
+      
+      const finalCount = parseInt(document.getElementById('count').value);
+      
+      if (candidatePool.length === 0) {
+        errorElement.innerText = "请先完成第一阶段选择！";
+        return;
+      }
+      
+      if (finalCount > candidatePool.length) {
+        errorElement.innerText = `候选池只有 ${candidatePool.length} 人，无法选择 ${finalCount} 人`;
+        return;
+      }
+      
+      // 从候选池中随机选择
+      finalSelection = getRandomSubset(candidatePool, finalCount);
+      document.getElementById('phase2Result').innerHTML = 
+        `<strong>最终${finalCount}人名单：</strong><br>` +
+        finalSelection.join("、");
+    }
+    
+    // Fisher-Yates洗牌算法
+    function getRandomSubset(array, n) {
+      const shuffled = array.slice();
+      let currentIndex = shuffled.length;
+      
+      while (currentIndex > 0) {
+        const randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        
+        // 交换元素
+        [shuffled[currentIndex], shuffled[randomIndex]] = 
+          [shuffled[randomIndex], shuffled[currentIndex]];
+      }
+      
+      return shuffled.slice(0, n);
+    }
+    
+    function resetSelection() {
+      candidatePool = [];
+      finalSelection = [];
+      document.getElementById('phase1Result').innerText = "";
+      document.getElementById('phase2Result').innerText = "";
+      document.getElementById('errorMsg').innerText = "";
+      document.getElementById('count').value = "3";
+    }
   </script>
 </body>
 </html>
