@@ -2,158 +2,413 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>增强版随机点名系统</title>
   <style>
+    /* reset */
+			ul{
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				background-color: #222222;
+			}
+			li{
+				padding: 0;
+				margin: 0;
+			}
+			/* tool */
+			.fl{
+				float: left;
+			}
+			.fr{
+				float: right;
+			}
+			.clearfix::after{
+				content: "";
+				clear: both;
+				display: block;
+			}
+			/* mian */
+			
+			.nav-li .contact{
+				padding: 16px 20px;
+				color: #eeeeee;
+				display: block;
+				text-decoration: none;
+				font-size: 14px;
+				line-height: 18px;
+			}
+			.nav-li .contact:hover{
+				color: #ffffff;
+				background-color: #404040;
+			}
+			.nav{
+				position: relative;
+				background-color: #222222;
+			}
+			.drop-box{
+				position: absolute;
+				top: 50px;
+				background-color: #404040;
+				min-width: 110px; 
+			}
+			.drop-box a{
+				padding: 8px 20px;
+				color: #FFFFFF;
+				display: block;
+				text-decoration: none;
+				font-size: 12px;
+			}
     body {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      padding: 0px;
+      font-family: Arial, sans-serif;
+    }
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 80%;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+      margin: 5px;
     }
     #result {
-      font-size: 2rem;
-      margin-top: 1rem;
+      font-size: 1.5rem;
+      margin: 10px 0;
+      color: #2c3e50;
+    }
+    .history-item {
+      margin: 5px 0;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    input, select {
+      padding: 5px;
+      margin: 5px;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+    <div class="box">
+        <ul class="nav clearfix">
+            <li class="nav-li fl">
+                <a href="" class="contact">首页</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">点名</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">课件</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">作业</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">成绩</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">讨论</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">分组</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">测试</a>
+            </li>
+            <li class="nav-li fl">
+                <a href="" class="contact">资料</a>
+            </li>
+        </ul>
+    </div>
+  <div class="section">
+    <h2>随机点名</h2>
+    <select id="countSelect">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <button onclick="rollStudents()">开始点名</button>
+    <p id="result"></p>
+  </div>
+
+  <div class="section">
+    <h3>历史记录（最近10条）</h3>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="section">
+    <h3>查询被点次数</h3>
+    <input type="text" id="queryName" placeholder="输入学生姓名">
+    <button onclick="queryCount()">查询</button>
+    <p id="queryResult"></p>
+  </div>
+
+  <div class="section">
+    <h3>记录缺勤次数</h3>
+    <input type="text" id="absenceName" placeholder="输入学生姓名">
+    <button onclick="recordAbsence()">缺勤</button>
+    <p id="absenceResult"></p>
+  </div>
+
+  <div class="section">
+    <h3>学生评分</h3>
+    <select id="studentSelect"></select>
+    <input type="number" id="scoreInput" min="0" max="100" placeholder="0-100分">
+    <button onclick="saveScore()">提交分数</button>
+    <p id="scoreResult"></p>
+  </div>
+
   <script>
     const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
+    "肖金洋",
+    "廖嘉辉",
+    "李锐钊",
+    "罗斯",
+    "沈嘉乐",
+    "李佳音",
+    "丁烁芝",
+    "王宥森",
+    "严浩文",
+    "赖鼎昭",
+    "朱潇瑶",
+    "刘盛邦",
+    "黄润轩",
+    "许梓烁",
+    "杨鑫",
+    "詹伟翔",
+    "章豪斌",
+    "钟晨晖",
+    "丁奕轩",
+    "黄梓城",
+    "彭志泓",
+    "王阳明",
+    "吴承徽",
+    "吴佳霖",
+    "吴乐超",
+    "吴睿",
+    "吴深荣",
+    "吴玟欣",
+    "吴晓恒",
+    "吴修远",
+    "肖睿",
+    "肖添",
+    "谢家和",
+    "谢润文",
+    "熊昊翔",
+    "熊彦钧",
+    "徐观炼",
+    "徐上",
+    "徐子欣",
+    "许才明",
+    "许君兰",
+    "闫麟昊",
+    "阳文轩",
+    "杨凯",
+    "杨立新",
+    "杨铭昊",
+    "杨培凯",
+    "杨希凯",
+    "杨晓乐",
+    "杨正宇",
+    "姚书璟",
+    "姚宇翔",
+    "叶崇杰",
+    "游璐玮",
+    "于远洋",
+    "余俊翰",
+    "余鑫",
+    "张苇航",
+    "元朗曦",
+    "袁舜骐",
+    "岳峻宇",
+    "詹佳烨",
+    "张博然",
+    "张浩宇",
+    "张皓昱",
+    "张景翔",
+    "张洛瑜",
+    "张人心",
+    "张若璇",
+    "张文坚",
+    "张文翔",
+    "张相钊",
+    "张晔",
+    "张逸",
+    "张颖琳",
+    "张宇然",
+    "张玉瑶",
+    "张誉方",
+    "张越",
+    "赵施琦",
+    "郑达维",
+    "郑浩翔",
+    "郑皓",
+    "郑晋凯",
+    "郑思扬",
+    "郑晓丰",
+    "郑鑫宇",
+    "郑芸熙",
+    "职雨欣",
+    "钟泓瑨",
+    "钟俊喆",
+    "钟思玥",
+    "钟旺烜",
+    "周海铭",
+    "周宏杰",
+    "周嘉尉",
+    "周逸",
+    "周雨桐",
+    "周梓枫",
+    "邹书承",
+    "吴永聪",
+    "肖淇",
+    "徐泓昊",
+    "薛炜鹏",
+    "张周骁",
+    "周子健",
+    "常淇博",
+    "陈畅",
+    "陈大有",
+    "陈龙",
+    "陈仁培",
+    "陈思谋",
+    "段玉飞",
+    "古康杰",
+    "郭延庚",
+    "何晓文",
+    "胡泉",
+    "李延泽",
+    "廖雪欣",
+    "林翠敏",
+    "林昀熠",
+    "龙宇海",
+    "卢晓玲",
+    "吕振宁",
+    "郭靖宇"];
+    
+    // 初始化数据存储
+    let history = [];
+    const studentCounts = {};
+    const studentScores = {};
+    const studentAbsenceCounts = {};
+    
+    // 初始化学生数据
+    students.forEach(student => {
+      studentCounts[student] = 0;
+      studentScores[student] = [];
+    });
+
+    // 填充学生选择下拉菜单
+    const studentSelect = document.getElementById('studentSelect');
+    students.forEach(student => {
+      const option = document.createElement('option');
+      option.value = student;
+      option.textContent = student;
+      studentSelect.appendChild(option);
+    });
+
+    // 点名功能
+    function rollStudents() {
+      const count = parseInt(document.getElementById('countSelect').value);
+      const selected = [];
+      
+      for (let i = 0; i < count; i++) {
+        const index = Math.floor(Math.random() * students.length);
+        const student = students[index];
+        if (selected.includes(student) || studentCounts[student] >= 3) {   // 确保不重复且不超过3次
+            i --;
+            continue;
+        }
+        selected.push(student);
+        studentCounts[student]++;
+      }
+
+      // 记录历史
+      const timestamp = new Date().toLocaleString();
+      history.unshift({  // 添加到开头
+        time: timestamp,
+        students: selected
+      });
+
+      // 保持最多10条历史记录
+      history = history.slice(0, 10);
+
+      updateDisplay(selected);
+    }
+
+    // 更新显示
+    function updateDisplay(selected) {
+      // 显示结果
+      document.getElementById('result').textContent = selected.join(", ");
+      
+      // 更新历史记录
+      const historyList = document.getElementById('historyList');
+      historyList.innerHTML = history.map(item => 
+        `<div class="history-item">
+          [${item.time}] ${item.students.join(", ")}
+        </div>`
+      ).join('');
+    }
+
+
+    // 查询次数
+    function queryCount() {
+      const name = document.getElementById('queryName').value.trim();
+      const resultElement = document.getElementById('queryResult');
+      
+      if (students.includes(name)) {
+        resultElement.textContent = `${name} 已被点名 ${studentCounts[name]} 次`;
+        resultElement.style.color = '#27ae60';
+      } else {
+        resultElement.textContent = "找不到该学生";
+        resultElement.style.color = '#e74c3c';
+      }
+    }
+    
+    // 记录缺勤次数
+    function recordAbsence() {
+      const name = document.getElementById('absenceName').value.trim();
+      const resultElement = document.getElementById('absenceResult');
+      
+      if (students.includes(name)) {
+        studentAbsenceCounts[name] = (studentAbsenceCounts[name] || 0) + 1;
+        resultElement.textContent = `${name} 已缺勤 ${studentAbsenceCounts[name]} 次`;
+        resultElement.style.color = '#27ae60';
+      } else {
+        resultElement.textContent = "找不到该学生";
+        resultElement.style.color = '#e74c3c';
+      }
+    }
+    // 保存分数
+    function saveScore() {
+      const student = document.getElementById('studentSelect').value;
+      const score = parseInt(document.getElementById('scoreInput').value);
+      const resultElement = document.getElementById('scoreResult');
+
+      if (isNaN(score)) {
+        resultElement.textContent = "请输入有效分数";
+        resultElement.style.color = '#e74c3c';
+        return;
+      }
+
+      studentScores[student].push(score);
+      const average = (studentScores[student].reduce((a, b) => a + b, 0) / studentScores[student].length);
+      
+      resultElement.innerHTML = `
+        已记录 ${student} 的新分数：${score}<br>
+        当前平均分：${average.toFixed(1)}（共${studentScores[student].length}次评分）
+      `;
+      resultElement.style.color = '#2980b9';
+      document.getElementById('scoreInput').value = '';
+    }
+
   </script>
 </body>
 </html>
