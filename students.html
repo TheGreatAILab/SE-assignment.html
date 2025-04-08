@@ -1,159 +1,93 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>随机点名</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>随机点名</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        button {
+            font-size: 2rem;
+            padding: 1rem 2rem;
+            margin: 0.5rem;
+        }
+
+        #result {
+            font-size: 2rem;
+            margin-top: 1rem;
+        }
+
+        #scoreboard {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
+
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
-  </script>
+    <button onclick="rollCall()">点名</button>
+    <p id="result"></p>
+    <div id="mark-buttons" style="display: none;">
+        <button onclick="markPerformance('correct')">回答正确</button>
+        <button onclick="markPerformance('absent')">缺课</button>
+    </div>
+    <div id="scoreboard"></div>
+
+    <script>
+        const students = ["谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐", "李佳音", "丁烁芝", "王宥森",
+            "严浩文", "赖鼎昭", "朱潇瑶", "刘盛邦", "黄润轩", "许梓烁", "杨鑫", "詹伟翔", "章豪斌", "钟晨晖",
+            "丁奕轩", "黄梓城", "彭志泓", "23336232", "吴承徽", "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣",
+            "吴晓恒", "吴修远", "肖睿", "肖添", "谢家和", "谢润文", "熊昊翔", "熊彦钧", "徐观炼", "徐上",
+            "徐子欣", "许才明", "许君兰", "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯", "杨希凯",
+            "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰", "游璐玮", "于远洋", "余俊翰", "余鑫", "张苇航",
+            "元朗曦", "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇", "张皓昱", "张景翔", "张洛瑜", "张人心",
+            "张若璇", "张文坚", "张文翔", "张相钊", "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶", "张誉方",
+            "张越", "赵施琦", "郑达维", "郑浩翔", "郑皓", "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙",
+            "职雨欣", "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰", "周嘉尉", "周逸", "周雨桐",
+            "周梓枫", "邹书承", "吴永聪", "肖淇", "徐泓昊", "薛炜鹏", "张周骁", "周子健", "常淇博", "陈畅",
+            "陈大有", "陈龙", "陈仁培", "陈思谋", "段玉飞", "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽",
+            "廖雪欣", "林翠敏", "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"
+        ];
+        const scores = {};
+        let currentStudent;
+
+        function rollCall() {
+            const randomIndex = Math.floor(Math.random() * students.length);
+            currentStudent = students[randomIndex];
+            document.getElementById('result').innerText = currentStudent;
+            document.getElementById('mark-buttons').style.display = 'block';
+        }
+
+        function markPerformance(result) {
+            if (!scores[currentStudent]) {
+                scores[currentStudent] = { score: 0, absent: false };
+            }
+            if (result === 'correct') {
+                scores[currentStudent].score++;
+            } else if (result === 'absent') {
+                scores[currentStudent].absent = true;
+            }
+            document.getElementById('mark-buttons').style.display = 'none';
+            updateScoreboard();
+        }
+
+        function updateScoreboard() {
+            const scoreboard = document.getElementById('scoreboard');
+            scoreboard.innerHTML = '<h2>课堂表现记录</h2>';
+            for (const student in scores) {
+                const info = scores[student];
+                scoreboard.innerHTML += `<p>${student}: 得分 ${info.score}, 缺课: ${info.absent? '是' : '否'}</p>`;
+            }
+        }
+    </script>
 </body>
+
 </html>
