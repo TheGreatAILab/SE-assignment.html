@@ -1,159 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>随机点名</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能课堂点名系统</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        button {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.8rem;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: transform 0.1s, box-shadow 0.3s;
+            margin: 2rem 0;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #result {
+            font-size: 2.5rem;
+            margin: 2rem 0;
+            padding: 1.5rem 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-width: 300px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #counter {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .pulse {
+            animation: pulse 0.8s ease-out;
+            opacity: 1 !important;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"23336284",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
-  </script>
+    <div id="counter">剩余可点名人数：<span id="count">60</span></div>
+    <button onclick="pickStudent()">开始智能点名</button>
+    <div id="result"></div>
+
+    <script>
+        // 初始化学生数据
+        const students = [
+            "谢慧豪","肖金洋","廖嘉辉","李锐钊","罗斯","沈嘉乐",
+            "李佳音","丁烁芝","王宥森","严浩文","赖鼎昭","朱潇瑶",
+            "刘盛邦","黄润轩","许梓烁","杨鑫","詹伟翔","章豪斌",
+            "钟晨晖","丁奕轩","黄梓城","彭志泓","王阳明","吴承徽",
+            "吴佳霖","吴乐超","吴睿","吴深荣","吴玟欣","吴晓恒",
+            "吴修远","肖睿","肖添","谢家和","谢润文","熊昊翔",
+            "熊彦钧","徐观炼","徐上","徐子欣","许才明","许君兰",
+            "闫麟昊","阳文轩","杨凯","杨立新","杨铭昊","杨培凯",
+            "杨希凯","杨晓乐","杨正宇","姚书璟","姚宇翔","叶崇杰",
+            "游璐玮","于远洋","余俊翰","余鑫","张苇航","元朗曦",
+            "袁舜骐","岳峻宇","詹佳烨","张博然","张浩宇","张皓昱",
+            "张景翔","张洛瑜","张人心","张若璇","张文坚","张文翔",
+            "张相钊","张晔","张逸","张颖琳","张宇然","张玉瑶",
+            "张誉方","张越","赵施琦","郑达维","郑浩翔","郑皓",
+            "郑晋凯","郑思扬","郑晓丰","郑鑫宇","郑芸熙","职雨欣",
+            "钟泓瑨","钟俊喆","钟思玥","钟旺烜","周海铭","周宏杰",
+            "周嘉尉","周逸","周雨桐","周梓枫","邹书承","吴永聪",
+            "肖淇","徐泓昊","薛炜鹏","张周骁","周子健","常淇博",
+            "陈畅","陈大有","陈龙","陈仁培","陈思谋","段玉飞",
+            "古康杰","郭延庚","何晓文","胡泉","李延泽","廖雪欣",
+            "林翠敏","林昀熠","龙宇海","卢晓玲","吕振宁","郭靖宇"
+        ];
+
+        // 系统状态
+        let remainingStudents = [...students];
+        let pickedHistory = [];
+
+        // DOM元素
+        const resultElement = document.getElementById('result');
+        const counterElement = document.getElementById('count');
+
+        function updateCounter() {
+            counterElement.textContent = remainingStudents.length;
+        }
+
+        function pickStudent() {
+            if (remainingStudents.length === 0) {
+                const confirmReset = confirm("所有学生均已点名！是否重置名单？");
+                if (confirmReset) {
+                    remainingStudents = [...students];
+                    pickedHistory = [];
+                    updateCounter();
+                    resultElement.textContent = "名单已重置";
+                    resultElement.style.opacity = '1';
+                    setTimeout(() => resultElement.style.opacity = '0', 1500);
+                }
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+            const picked = remainingStudents.splice(randomIndex, 1)[0];
+            pickedHistory.push(picked);
+
+            // 更新界面
+            resultElement.textContent = picked;
+            resultElement.classList.add('pulse');
+            updateCounter();
+
+            // 语音播报（需要用户交互后生效）
+            if (window.speechSynthesis) {
+                const utterance = new SpeechSynthesisUtterance(picked);
+                utterance.lang = 'zh-CN';
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 动画结束处理
+        resultElement.addEventListener('animationend', () => {
+            resultElement.classList.remove('pulse');
+        });
+
+        // 初始化计数器
+        updateCounter();
+    </script>
 </body>
 </html>
