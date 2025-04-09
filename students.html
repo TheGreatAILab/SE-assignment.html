@@ -1,159 +1,264 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>随机点名</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>软工点名</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: #f5f6fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        #roulette-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 50%;
+        }
+        #roulette {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background: white;
+            transform: rotate(0deg);
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        #pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e74c3c;
+            transform: translateX(-50%);
+            z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        #name-display {
+            width: 320px;
+            height: 180px;
+            padding: 12px;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            user-select: none;
+        }
+        button {
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="number"] {
+            padding: 10px;
+            width: 120px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
-"22360300",
-"22368031",
-"22361058",
-"罗斯",
-"沈嘉乐",
-"22336113",
-"22345020",
-"22346095",
-"23354177",
-"23355032",
-"23366094",
-"23336284",
-"23336272",
-"23364037",
-"23308060",
-"23336299",
-"章豪斌",
-"23331029",
-"23336336",
-"23331059",
-"彭志泓",
-"23336232",
-"23336247",
-"23336249",
-"23336250",
-"吴睿",
-"吴深荣",
-"23336253",
-"23336254",
-"23336255",
-"23336259",
-"23336260",
-"谢家和",
-"23336262",
-"23336265",
-"23336267",
-"23336266",
-"徐上",
-"徐子欣",
-"23336270",
-"23336271",
-"闫麟昊",
-"23336275",
-"23336276",
-"杨立新",
-"23336279",
-"23336278",
-"杨希凯",
-"23336282",
-"杨正宇",
-"23336286",
-"23336287",
-"叶崇杰",
-"23336290",
-"23336289",
-"23336291",
-"余鑫",
-"张苇航",
-"23336294",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"23336300",
-"23336302",
-"23336301",
-"张景翔",
-"23336305",
-"23336306",
-"23336307",
-"23336309",
-"张文翔",
-"张相钊",
-"张晔",
-"23336314",
-"23336313",
-"张宇然",
-"23336316",
-"23336318",
-"23336317",
-"23336324",
-"23336326",
-"郑浩翔",
-"23336328",
-"郑晋凯",
-"23336331",
-"23336332",
-"23336333",
-"23336334",
-"职雨欣",
-"23336339",
-"23336338",
-"23336341",
-"23336342",
-"周海铭",
-"23336346",
-"23336348",
-"23336350",
-"周雨桐",
-"23336353",
-"邹书承",
-"23336017",
-"23336016",
-"23336015",
-"23336018",
-"23336019",
-"23336020",
-"23336028",
-"23336032",
-"23336033",
-"23336042",
-"23336044",
-"陈思谋",
-"23336063",
-"23336076",
-"23336084",
-"23336080",
-"23336089",
-"李延泽",
-"23336135",
-"23336132",
-"23336145",
-"23336165",
-"23336170",
-"23336178",
-"23320048"];
-  </script>
+    <div class="controls">
+        <div class="input-group">
+            <input type="number" id="count" placeholder="抽取人数" min="1">
+            <button onclick="generateInput()">生成名单</button>
+        </div>
+    </div>
+    <div id="name-display">点击"生成名单"按钮显示名单</div>
+    <button onclick="initRoulette()">生成轮盘</button>
+    
+    <div id="roulette-container">
+        <div id="pointer"></div>
+        <canvas id="roulette"></canvas>
+    </div>
+    
+    <button onclick="startLottery()" id="start-btn" disabled>开始旋转</button>
+
+    <script>
+        // 学生名单
+        const students = [
+    "谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐", "李佳音", "丁烁芝",
+    "王宥森", "严浩文", "赖鼎昭", "朱潇瑶", "刘盛邦", "黄润轩", "许梓烁", "杨鑫",
+    "詹伟翔", "章豪斌", "钟晨晖", "丁奕轩", "黄梓城", "彭志泓", "王阳明", "吴承徽",
+    "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣", "吴晓恒", "吴修远", "肖睿", "肖添",
+    "谢家和", "谢润文", "熊昊翔", "熊彦钧", "徐观炼", "徐上", "徐子欣", "许才明",
+    "许君兰", "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯", "杨希凯",
+    "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰", "游璐玮", "于远洋", "余俊翰",
+    "余鑫", "张苇航", "元朗曦", "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇",
+    "张皓昱", "张景翔", "张洛瑜", "张人心", "张若璇", "张文坚", "张文翔", "张相钊",
+    "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶", "张誉方", "张越", "赵施琦",
+    "郑达维", "郑浩翔", "郑皓", "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙",
+    "职雨欣", "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰", "周嘉尉",
+    "周逸", "周雨桐", "周梓枫", "邹书承", "吴永聪", "肖淇", "徐泓昊", "薛炜鹏",
+    "张周骁", "周子健", "常淇博", "陈畅", "陈大有", "陈龙", "陈仁培", "陈思谋",
+    "段玉飞", "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽", "廖雪欣", "林翠敏",
+    "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"];
+
+        // 系统变量
+        let rotation = 0;
+        let isAnimating = false;
+        let currentNames = [];
+
+        // 生成随机名单
+        function generateInput() {
+            const countInput = document.getElementById('count');
+            const count = Math.min(parseInt(countInput.value), students.length);
+            
+            if (!count || count < 1) {
+                alert("请输入有效的抽取人数");
+                return;
+            }
+            
+            // 随机打乱并选取指定数量学生
+            const shuffled = [...students].sort(() => 0.5 - Math.random());
+            currentNames = shuffled.slice(0, count);
+            document.getElementById('name-display').textContent = currentNames.join('\n');
+        }
+
+        // 初始化轮盘
+        function initRoulette() {
+            if (currentNames.length < 2) {
+                alert("请先生成至少包含2个名字的名单");
+                return;
+            }
+
+            const canvas = document.getElementById('roulette');
+            const ctx = canvas.getContext('2d');
+            const size = 500;
+            
+            // 设置画布尺寸
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            ctx.scale(dpr, dpr);
+            
+            ctx.clearRect(0, 0, size, size);
+
+            // 精确计算每个扇形的角度
+            const totalAngle = 2 * Math.PI;
+            const segmentAngle = totalAngle / currentNames.length;
+            
+            // 绘制扇形
+            currentNames.forEach((name, index) => {
+                const start = index * segmentAngle - Math.PI/2; // 12点方向为起点
+                const end = (index + 1) * segmentAngle - Math.PI/2;
+                
+                const finalEnd = index === currentNames.length - 1 ? 
+                    totalAngle - Math.PI/2 : end;
+
+                ctx.beginPath();
+                ctx.moveTo(size/2, size/2);
+                ctx.arc(size/2, size/2, size/2, start, finalEnd);
+                ctx.fillStyle = getSegmentColor(index, currentNames.length);
+                ctx.fill();
+
+                // 绘制文字（自动适应大小）
+                drawPreciseText(ctx, name, size, start, finalEnd);
+            });
+
+            enableStartButton();
+        }
+
+        // 获取分段颜色
+        function getSegmentColor(index, total) {
+            const hue = (index * 360 / total) % 360;
+            return `hsl(${hue}, 70%, 80%)`;
+        }
+
+        // 精确文字绘制
+        function drawPreciseText(ctx, text, size, startAngle, endAngle) {
+            ctx.save();
+            
+            // 计算文字位置
+            const midAngle = (startAngle + endAngle) / 2;
+            const textRadius = size * 0.35;
+            const x = size/2 + Math.cos(midAngle) * textRadius;
+            const y = size/2 + Math.sin(midAngle) * textRadius;
+
+            // 文字排版设置
+            ctx.translate(x, y);
+            ctx.rotate(midAngle + Math.PI/2); // 文字朝向圆心
+            
+            // 自动调整字体大小
+            const maxWidth = size * 0.5;
+            let fontSize = 16;
+            do {
+                ctx.font = `bold ${fontSize}px Arial`;
+            } while (ctx.measureText(text).width > maxWidth && --fontSize > 10);
+
+            // 绘制文字
+            ctx.fillStyle = 'white';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 3;
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 0, 0);
+            
+            ctx.restore();
+        }
+
+        // 启用开始按钮
+        function enableStartButton() {
+            document.getElementById('start-btn').disabled = false;
+            rotation = 0;
+            document.getElementById('roulette').style.transform = 'rotate(0deg)';
+        }
+
+        // 开始旋转
+        function startLottery() {
+            if (isAnimating) return;
+            
+            const roulette = document.getElementById('roulette');
+            const spins = 5 + Math.random() * 3; // 5-8圈
+            const target = rotation + spins * 360;
+            
+            isAnimating = true;
+            document.getElementById('start-btn').disabled = true;
+            roulette.style.transform = `rotate(-${target}deg)`;
+            
+            // 动画结束后重置状态
+            roulette.addEventListener('transitionend', () => {
+                isAnimating = false;
+                rotation = target % 360;
+                document.getElementById('start-btn').disabled = false;
+            }, { once: true });
+        }
+    </script>
 </body>
 </html>
