@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>智能考勤</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       display: flex;
@@ -12,6 +13,10 @@
       height: 100vh;
       margin: 0;
     }
+    hr {
+        margin: 80px 0;
+        width: 100%;
+    }
     button {
       font-size: 2rem;
       padding: 1rem 2rem;
@@ -20,10 +25,44 @@
       font-size: 2rem;
       margin-top: 1rem;
     }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 20px;
+      width: 80%;
+    }
+    .chart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .alert {
+      color: red;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .control-panel {
+      display: flex;
+      gap: 10px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ffeb3b;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+<hr>
+<button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
     点名
   </button>
   <p id="result"></p>
@@ -82,7 +121,7 @@
 "姚书璟",
 "姚宇翔",
 "叶崇杰",
-"游璐玮",
+"23336289",
 "于远洋",
 "余俊翰",
 "余鑫",
@@ -154,6 +193,206 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+  </script>
+  <div class="control-panel">
+    <div>
+      <select id="status">
+        <option value="present">出勤</option>
+        <option value="late">迟到</option>
+        <option value="early">早退</option>
+        <option value="absent">缺勤</option>
+      </select>
+      <select id="class">
+        <option value="软件工程一班">软件工程一班</option>
+        <option value="软件工程二班">软件工程二班</option>
+        <option value="软件工程三班">软件工程三班</option>
+      </select>
+      <button onclick="recordAttendance()">记录考勤</button>
+    </div>
+    <div>
+      <select id="reportRange" onchange="updateCharts()">
+        <option value="daily">日报</option>
+        <option value="weekly">周报</option>
+        <option value="monthly">月报</option>
+      </select>
+      <input type="time" id="reminderTime" value="09:00">
+      <button onclick="saveSettings()">保存设置</button>
+    </div>
+      <div class="control-panel">
+
+  <div>
+    <button onclick="clearAllRecords()" style="background-color: #ff4444; color: white;">一键清空记录</button>
+  </div>
+</div>
+  </div>
+
+  <div class="dashboard">
+    <div class="chart-container">
+      <canvas id="attendanceChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <canvas id="classComparison"></canvas>
+    </div>
+  </div>
+
+  <div id="alerts"></div>
+  <div id="notification" class="notification" style="display: none;"></div>
+
+  <script>
+      const classColors = {
+        "软件工程一班": "#4CAF50",
+        "软件工程二班": "#2196F3",
+        "软件工程三班": "#FF9800"
+    };
+
+    function clearAllRecords() {
+  if (confirm("确定要清空所有考勤记录吗？此操作不可恢复！")) {
+    localStorage.removeItem('attendanceData');
+    attendanceData = [];
+
+    if (charts.attendanceChart) charts.attendanceChart.destroy();
+    if (charts.classComparison) charts.classComparison.destroy();
+
+    updateCharts();
+
+    document.getElementById('alerts').innerHTML = '';
+
+    showNotification('所有记录已清空', 5000);
+  }
+}
+    let charts = {};
+    let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || [];
+    let settings = JSON.parse(localStorage.getItem('settings')) || { reminderTime: '09:00' };
+
+    // 保存设置
+    function saveSettings() {
+      settings.reminderTime = document.getElementById('reminderTime').value;
+      localStorage.setItem('settings', JSON.stringify(settings));
+      showNotification('设置已保存');
+    }
+
+    // 考勤记录
+    function recordAttendance() {
+      const student = students[Math.floor(Math.random() * students.length)];
+      const status = document.getElementById('status').value;
+      const className = document.getElementById('class').value;
+
+      const record = {
+        student,
+        status,
+        class: className,
+        timestamp: new Date().toISOString()
+      };
+
+      attendanceData.push(record);
+      localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+
+      checkAttendancePatterns();
+      updateCharts();
+      showNotification('考勤记录已保存');
+    }
+
+    // 生成报表
+    function generateReport() {
+      const range = document.getElementById('reportRange').value;
+      const now = new Date();
+      return attendanceData.filter(record => {
+        const recordDate = new Date(record.timestamp);
+        switch(range) {
+          case 'weekly':
+            return recordDate > new Date(now.setDate(now.getDate() - 7));
+          case 'monthly':
+            return new Date(recordDate).getMonth() === new Date().getMonth();
+          default:
+            return recordDate.toDateString() === new Date().toDateString();
+        }
+      });
+    }
+
+    // 数据可视化
+    function updateCharts() {
+      const reportData = generateReport();
+
+      // 销毁旧图表
+      if (charts.attendanceChart) charts.attendanceChart.destroy();
+      if (charts.classComparison) charts.classComparison.destroy();
+
+      // 考勤分布饼图
+      const statusCounts = reportData.reduce((acc, {status}) => {
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {});
+
+      charts.attendanceChart = new Chart(document.getElementById('attendanceChart'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(statusCounts),
+          datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: ['#4CAF50', '#FFC107', '#FF5722', '#F44336']
+          }]
+        }
+      });
+
+      // 班级比较柱状图
+      const classes = [...new Set(reportData.map(r => r.class))];
+        const datasets = classes.map(className => {
+        const classData = reportData.filter(r => r.class === className);
+        const total = classData.length;
+        return {
+            label: className,
+            data: [
+                (classData.filter(d => d.status === 'present').length / total * 100).toFixed(2),
+                (classData.filter(d => d.status === 'late').length / total * 100).toFixed(2),
+                (classData.filter(d => d.status === 'early').length / total * 100).toFixed(2)
+            ],
+            backgroundColor: classColors[className] || "#9E9E9E"  // 使用预设颜色，默认灰色
+        };
+    });
+
+      charts.classComparison = new Chart(document.getElementById('classComparison'), {
+        type: 'bar',
+        data: {
+          labels: ['出勤率', '迟到率', '早退率'],
+          datasets: datasets
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '百分比 (%)'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 点名提醒
+    function checkRollCallReminder() {
+      const [targetHours, targetMinutes] = settings.reminderTime.split(':');
+      const now = new Date();
+
+      if (now.getHours() === parseInt(targetHours) &&
+          now.getMinutes() === parseInt(targetMinutes)) {
+        showNotification('即将到点名时间，请准备开始考勤！');
+      }
+    }
+
+    // 显示通知
+    function showNotification(message, duration=3000) {
+      const el = document.getElementById('notification');
+      el.style.display = 'block';
+      el.textContent = message;
+      setTimeout(() => el.style.display = 'none', duration);
+    }
+
+    // 初始化
+    document.getElementById('reminderTime').value = settings.reminderTime;
+    setInterval(checkRollCallReminder, 60000);
+    updateCharts();
   </script>
 </body>
 </html>
