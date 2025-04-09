@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Student Picker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Random Student Picker</h1>
+        <p>Click the button to get a random student's name and ID.</p>
+
+        <button id="getRandomBtn">Get Random Student</button>
+
+        <div id="resultArea" class="result-area">
+            <!-- Results will be displayed here -->
+            <p id="loadingMsg" style="display: none;">Loading...</p>
+            <p id="errorMsg" class="error-msg" style="display: none;"></p>
+            <div id="studentInfo" style="display: none;">
+                <h2>Selected Student:</h2>
+                <p><strong>Name:</strong> <span id="studentName"></span></p>
+                <p><strong>ID:</strong> <span id="studentId"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getBtn = document.getElementById('getRandomBtn');
+        const resultArea = document.getElementById('resultArea');
+        const studentInfoDiv = document.getElementById('studentInfo');
+        const studentNameSpan = document.getElementById('studentName');
+        const studentIdSpan = document.getElementById('studentId');
+        const loadingMsg = document.getElementById('loadingMsg');
+        const errorMsg = document.getElementById('errorMsg');
+
+        getBtn.addEventListener('click', fetchRandomStudent);
+
+        async function fetchRandomStudent() {
+            // Clear previous results and show loading indicator
+            studentInfoDiv.style.display = 'none';
+            errorMsg.style.display = 'none';
+            errorMsg.textContent = ''; // Clear previous error text
+            loadingMsg.style.display = 'block';
+            getBtn.disabled = true; // Disable button during fetch
+
+            try {
+                const response = await fetch('/random'); // Fetch from the backend endpoint
+
+                // Check if the response status is OK (e.g., 200)
+                if (!response.ok) {
+                    // Try to get error message from backend JSON response
+                    let errorData;
+                    try {
+                        errorData = await response.json();
+                    } catch (jsonError) {
+                        // If response is not JSON or empty
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    // Use the error message from backend if available
+                    throw new Error(errorData.error || `Request failed with status: ${response.status}`);
+                }
+
+                // Parse the JSON data from the response
+                const data = await response.json();
+                studentNameSpan.textContent = data.name;
+                studentIdSpan.textContent = data.id;
+                loadingMsg.style.display = 'none';
+                studentInfoDiv.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error fetching random student:', error);
+                // Display error message to the user
+                errorMsg.textContent = `Error: ${error.message}`;
+                errorMsg.style.display = 'block';
+                loadingMsg.style.display = 'none'; // Hide loading on error
+            } finally {
+                getBtn.disabled = false; 
+            }
+        }
+    </script>
+</body>
+</html>
