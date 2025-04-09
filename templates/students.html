@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>随机点名</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      font-size: 1.5rem;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+    }
+    #result {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <button id="importBtn">导入数据</button>
+  <button id="pickBtn">点名</button>
+  <p id="result"></p>
+  <div>
+    <button id="presentBtn">标记到场</button>
+    <button id="absentBtn">标记缺勤</button>
+  </div>
+
+  <script>
+    let currentStudentId = null;
+
+    document.getElementById('importBtn').addEventListener('click', function() {
+      fetch('/import_students_info', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+        })
+        .catch(error => {
+          console.error('Error importing data:', error);
+          alert("导入数据时发生错误！");
+        });
+    });
+
+    document.getElementById('pickBtn').addEventListener('click', function() {
+      fetch('/pick')
+        .then(response => response.json())
+        .then(data => {
+          if (data.name && data.id) {
+            currentStudentId = data.id;
+            document.getElementById('result').innerText = `${data.name} (${data.id}) 被点名 ${data.timesCalled} 次，当前参与度：${data.participation}`;
+          } else {
+            document.getElementById('result').innerText = data.message || "未找到学生数据";
+          }
+        })
+        .catch(error => {
+          console.error('Error picking student:', error);
+          document.getElementById('result').innerText = "点名时发生错误！";
+        });
+    });
+
+    function updateAttendance(absent) {
+      if (!currentStudentId) {
+        alert("请先点名选择学生！");
+        return;
+      }
+      fetch('/update_participation', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: currentStudentId, absent: absent })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.new_participation !== undefined) {
+          alert(data.message);
+          document.getElementById('result').innerText = document.getElementById('result').innerText.replace(/当前参与度：[\d\.]+/, `当前参与度：${data.new_participation}`);
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(error => {
+        console.error("更新参与度出错: ", error);
+        alert("更新参与度时发生错误！");
+      });
+    }
+
+    document.getElementById('presentBtn').addEventListener('click', function() {
+      updateAttendance(false);
+    });
+
+    document.getElementById('absentBtn').addEventListener('click', function() {
+      updateAttendance(true);
+    });
+  </script>
+</body>
+</html>
