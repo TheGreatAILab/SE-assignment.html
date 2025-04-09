@@ -15,18 +15,28 @@
     button {
       font-size: 2rem;
       padding: 1rem 2rem;
+      margin: 0.5rem;
     }
     #result {
       font-size: 2rem;
-      margin-top: 1rem;
+      margin: 1rem 0;
+    }
+    #history {
+      margin-top: 2rem;
+      max-height: 300px;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <button onclick="pickStudent()">点名</button>
+  <div id="result"></div>
+  <div id="statusButtons" style="display: none;">
+    <button onclick="recordStatus('present')" style="background-color: #90EE90;">到场</button>
+    <button onclick="recordStatus('absent')" style="background-color: #FFB6C1;">缺席</button>
+  </div>
+  <div id="history"></div>
+
   <script>
     const students = ["谢慧豪",
 "肖金洋",
@@ -92,7 +102,7 @@
 "岳峻宇",
 "詹佳烨",
 "张博然",
-"23336301",
+"张浩宇",
 "张皓昱",
 "张景翔",
 "张洛瑜",
@@ -154,6 +164,63 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+
+    let history = JSON.parse(localStorage.getItem('history')) || [];
+    let recentStudents = JSON.parse(localStorage.getItem('recentStudents')) || [];
+    let currentStudent = null;
+
+    function pickStudent() {
+      // 过滤最近3次被点过的学生（可根据需要调整数量）
+      let candidates = students.filter(s => !recentStudents.includes(s));
+      
+      if (candidates.length === 0) {
+        candidates = students;
+        recentStudents = [];
+      }
+
+      const student = candidates[Math.floor(Math.random() * candidates.length)];
+      currentStudent = student;
+      document.getElementById('result').innerText = student;
+      document.getElementById('statusButtons').style.display = 'block';
+    }
+
+    function recordStatus(status) {
+      // 记录历史
+      history.push({
+        student: currentStudent,
+        status: status,
+        timestamp: new Date().toLocaleString()
+      });
+
+      // 更新最近点名列表（保留最近5条记录）
+      recentStudents.push(currentStudent);
+      if (recentStudents.length > 5) {
+        recentStudents.shift();
+      }
+
+      // 保存到本地存储
+      localStorage.setItem('history', JSON.stringify(history));
+      localStorage.setItem('recentStudents', JSON.stringify(recentStudents));
+
+      // 重置界面
+      document.getElementById('statusButtons').style.display = 'none';
+      updateHistoryDisplay();
+    }
+
+    function updateHistoryDisplay() {
+      const historyDiv = document.getElementById('history');
+      historyDiv.innerHTML = '<h3>历史记录（最近10条）</h3>';
+      history.slice(-10).reverse().forEach(entry => {
+        historyDiv.innerHTML += `
+          <div>${entry.timestamp} - ${entry.student}（${entry.status === 'present' ? '✅' : '❌'}）</div>
+        `;
+      });
+    }
+
+    // 初始化显示历史记录
+    updateHistoryDisplay();    
+
   </script>
+
 </body>
 </html>
