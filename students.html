@@ -12,12 +12,14 @@
             background: #f5f6fa;
             font-family: 'Segoe UI', sans-serif;
         }
+        
         .controls {
             margin: 20px 0;
             display: flex;
             gap: 15px;
             align-items: center;
         }
+        
         #roulette-container {
             position: relative;
             width: 500px;
@@ -26,6 +28,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             border-radius: 50%;
         }
+        
         #roulette {
             width: 100%;
             height: 100%;
@@ -36,6 +39,7 @@
             transform: rotate(0deg);
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
+        
         #pointer {
             position: absolute;
             top: -15px;
@@ -49,6 +53,7 @@
             z-index: 2;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
+        
         #name-display {
             width: 320px;
             height: 180px;
@@ -61,6 +66,7 @@
             white-space: pre-wrap;
             user-select: none;
         }
+        
         button {
             padding: 12px 24px;
             background: #3498db;
@@ -71,20 +77,24 @@
             transition: all 0.3s;
             font-size: 16px;
         }
+        
         button:hover {
             background: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
+        
         button:disabled {
             background: #95a5a6;
             cursor: not-allowed;
         }
+        
         .input-group {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+        
         input[type="number"] {
             padding: 10px;
             width: 120px;
@@ -101,7 +111,9 @@
             <button onclick="generateInput()">生成名单</button>
         </div>
     </div>
+    
     <div id="name-display">点击"生成名单"按钮显示名单</div>
+    
     <button onclick="initRoulette()">生成轮盘</button>
     
     <div id="roulette-container">
@@ -114,86 +126,94 @@
     <script>
         // 学生名单
         const students = [
-    "谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐", "李佳音", "丁烁芝",
-    "王宥森", "严浩文", "赖鼎昭", "朱潇瑶", "刘盛邦", "黄润轩", "许梓烁", "杨鑫",
-    "詹伟翔", "章豪斌", "钟晨晖", "丁奕轩", "黄梓城", "彭志泓", "王阳明", "吴承徽",
-    "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣", "吴晓恒", "吴修远", "肖睿", "肖添",
-    "谢家和", "谢润文", "熊昊翔", "熊彦钧", "徐观炼", "徐上", "徐子欣", "许才明",
-    "许君兰", "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯", "杨希凯",
-    "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰", "游璐玮", "于远洋", "余俊翰",
-    "余鑫", "张苇航", "元朗曦", "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇",
-    "张皓昱", "张景翔", "张洛瑜", "张人心", "张若璇", "张文坚", "张文翔", "张相钊",
-    "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶", "张誉方", "张越", "赵施琦",
-    "郑达维", "郑浩翔", "郑皓", "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙",
-    "职雨欣", "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰", "周嘉尉",
-    "周逸", "周雨桐", "周梓枫", "邹书承", "吴永聪", "肖淇", "徐泓昊", "薛炜鹏",
-    "张周骁", "周子健", "常淇博", "陈畅", "陈大有", "陈龙", "陈仁培", "陈思谋",
-    "段玉飞", "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽", "廖雪欣", "林翠敏",
-    "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"];
+            "谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐", "李佳音", "丁烁芝",
+            "王宥森", "严浩文", "赖鼎昭", "朱潇瑶", "刘盛邦", "黄润轩", "许梓烁", "杨鑫",
+            "詹伟翔", "章豪斌", "钟晨晖", "丁奕轩", "黄梓城", "彭志泓", "王阳明", "吴承徽",
+            "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣", "吴晓恒", "吴修远", "肖睿", "肖添",
+            "谢家和", "谢润文", "熊昊翔", "熊彦钧", "徐观炼", "徐上", "徐子欣", "许才明",
+            "许君兰", "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯", "杨希凯",
+            "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰", "游璐玮", "于远洋", "余俊翰",
+            "余鑫", "张苇航", "元朗曦", "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇",
+            "张皓昱", "张景翔", "张洛瑜", "张人心", "张若璇", "张文坚", "张文翔", "张相钊",
+            "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶", "张誉方", "张越", "赵施琦",
+            "郑达维", "郑浩翔", "郑皓", "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙",
+            "职雨欣", "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰", "周嘉尉",
+            "周逸", "周雨桐", "周梓枫", "邹书承", "吴永聪", "肖淇", "徐泓昊", "薛炜鹏",
+            "张周骁", "周子健", "常淇博", "陈畅", "陈大有", "陈龙", "陈仁培", "陈思谋",
+            "段玉飞", "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽", "廖雪欣", "林翠敏",
+            "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"
+        ];
 
         // 系统变量
-        let rotation = 0;
         let isAnimating = false;
         let currentNames = [];
+        let originalNames = [];
+        let isRouletteDirty = false;
 
         // 生成随机名单
         function generateInput() {
-            const countInput = document.getElementById('count');
-            const count = Math.min(parseInt(countInput.value), students.length);
+            if (isAnimating) return alert("请等待旋转完成");
+            const count = Math.min(parseInt(document.getElementById('count').value), students.length);
+            if (!count || count < 1) return alert("请输入有效人数");
             
-            if (!count || count < 1) {
-                alert("请输入有效的抽取人数");
-                return;
-            }
+            const newNames = [...students].sort(() => Math.random() - 0.5).slice(0, count);
+            if (JSON.stringify(newNames) === JSON.stringify(originalNames)) return;
             
-            // 随机打乱并选取指定数量学生
-            const shuffled = [...students].sort(() => 0.5 - Math.random());
-            currentNames = shuffled.slice(0, count);
+            currentNames = newNames;
+            originalNames = [...newNames];
             document.getElementById('name-display').textContent = currentNames.join('\n');
+            isRouletteDirty = true;
+            updateButtonStates();
         }
 
         // 初始化轮盘
         function initRoulette() {
-            if (currentNames.length < 2) {
-                alert("请先生成至少包含2个名字的名单");
-                return;
-            }
-
+            if (isAnimating) return alert("旋转中不可操作");
+            if (!isRouletteDirty) return;
+            if (currentNames.length < 2) return alert("至少需要2个名字");
+            
             const canvas = document.getElementById('roulette');
             const ctx = canvas.getContext('2d');
-            const size = 500;
+            const size = 500; // 明确定义尺寸
             
-            // 设置画布尺寸
+            // 重置轮盘状态
+            canvas.style.transition = 'none';
+            canvas.style.transform = 'rotate(0deg)';
+            void canvas.offsetWidth; // 强制重绘
+            
+            // 设置高清画布
             const dpr = window.devicePixelRatio || 1;
             canvas.width = size * dpr;
             canvas.height = size * dpr;
             ctx.scale(dpr, dpr);
-            
             ctx.clearRect(0, 0, size, size);
 
-            // 精确计算每个扇形的角度
-            const totalAngle = 2 * Math.PI;
-            const segmentAngle = totalAngle / currentNames.length;
-            
-            // 绘制扇形
+            // 绘制轮盘
+            const segmentAngle = (2 * Math.PI) / currentNames.length;
             currentNames.forEach((name, index) => {
-                const start = index * segmentAngle - Math.PI/2; // 12点方向为起点
-                const end = (index + 1) * segmentAngle - Math.PI/2;
+                const start = index * segmentAngle - Math.PI/2;
+                const end = start + segmentAngle;
                 
-                const finalEnd = index === currentNames.length - 1 ? 
-                    totalAngle - Math.PI/2 : end;
-
+                // 绘制扇形
                 ctx.beginPath();
                 ctx.moveTo(size/2, size/2);
-                ctx.arc(size/2, size/2, size/2, start, finalEnd);
-                ctx.fillStyle = getSegmentColor(index, currentNames.length);
+                ctx.arc(size/2, size/2, size/2, start, end);
+                ctx.fillStyle = `hsl(${(index * 360 / currentNames.length) % 360}, 70%, 80%)`;
                 ctx.fill();
+                
+                // 添加黑色边框
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
 
-                // 绘制文字（自动适应大小）
-                drawPreciseText(ctx, name, size, start, finalEnd);
+                // 绘制文字
+                drawText(ctx, name, size, start, end);
             });
-
-            enableStartButton();
+            
+            // 恢复动画并更新状态
+            setTimeout(() => canvas.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)', 50);
+            isRouletteDirty = false;
+            updateButtonStates();
         }
 
         // 获取分段颜色
@@ -203,61 +223,53 @@
         }
 
         // 精确文字绘制
-        function drawPreciseText(ctx, text, size, startAngle, endAngle) {
+        function drawText(ctx, text, size, startAngle, endAngle) {
             ctx.save();
-            
-            // 计算文字位置
             const midAngle = (startAngle + endAngle) / 2;
-            const textRadius = size * 0.35;
-            const x = size/2 + Math.cos(midAngle) * textRadius;
-            const y = size/2 + Math.sin(midAngle) * textRadius;
-
-            // 文字排版设置
-            ctx.translate(x, y);
-            ctx.rotate(midAngle + Math.PI/2); // 文字朝向圆心
+            const radius = size * 0.35;
+            const x = size/2 + Math.cos(midAngle) * radius;
+            const y = size/2 + Math.sin(midAngle) * radius;
             
-            // 自动调整字体大小
-            const maxWidth = size * 0.5;
+            ctx.translate(x, y);
+            ctx.rotate(midAngle + Math.PI/2);
+            
+            // 自适应字体大小
             let fontSize = 16;
-            do {
-                ctx.font = `bold ${fontSize}px Arial`;
-            } while (ctx.measureText(text).width > maxWidth && --fontSize > 10);
-
-            // 绘制文字
-            ctx.fillStyle = 'white';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 3;
+            while (ctx.measureText(text).width > size * 0.4 && fontSize > 10) {
+                fontSize--;
+            }
+            
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = '#000';
             ctx.textAlign = 'center';
             ctx.fillText(text, 0, 0);
-            
             ctx.restore();
-        }
-
-        // 启用开始按钮
-        function enableStartButton() {
-            document.getElementById('start-btn').disabled = false;
-            rotation = 0;
-            document.getElementById('roulette').style.transform = 'rotate(0deg)';
         }
 
         // 开始旋转
         function startLottery() {
-            if (isAnimating) return;
+            if (isAnimating || isRouletteDirty) return;
             
             const roulette = document.getElementById('roulette');
-            const spins = 5 + Math.random() * 3; // 5-8圈
-            const target = rotation + spins * 360;
+            const target = 1440 + Math.random() * 360; // 4-5圈随机角度
             
             isAnimating = true;
-            document.getElementById('start-btn').disabled = true;
-            roulette.style.transform = `rotate(-${target}deg)`;
+            updateButtonStates();
             
-            // 动画结束后重置状态
+            roulette.style.transform = `rotate(-${target}deg)`;
             roulette.addEventListener('transitionend', () => {
                 isAnimating = false;
-                rotation = target % 360;
-                document.getElementById('start-btn').disabled = false;
+                updateButtonStates();
             }, { once: true });
+        }
+
+        // 状态管理函数
+        function updateButtonStates() {
+            const generateBtn = document.querySelector("button[onclick='initRoulette()']");
+            const startBtn = document.getElementById('start-btn');
+            
+            generateBtn.disabled = isAnimating || !isRouletteDirty;
+            startBtn.disabled = isAnimating || isRouletteDirty;
         }
     </script>
 </body>
