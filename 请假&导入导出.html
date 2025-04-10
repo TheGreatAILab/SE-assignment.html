@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>随机点名及考勤系统</title>
+  <!-- 引入Google字体 -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 95%;
+      max-width: 900px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    h1, h2, h3 {
+      text-align: center;
+      color: #333;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .btn {
+      background-color: #5563DE;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 5px;
+    }
+    .btn:hover {
+      background-color: #4351b5;
+    }
+    #currentStudent {
+      font-size: 1.5rem;
+      margin: 10px 0;
+      color: #333;
+      font-weight: 500;
+    }
+    .btn-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    li {
+      margin: 5px 0;
+      line-height: 1.6;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .header-actions button {
+      flex: 1;
+      margin: 5px;
+    }
+    /* 名单选择区域 */
+    .list-selection {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .list-selection label {
+      margin-right: 15px;
+      font-weight: 500;
+    }
+    #csvInput {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>随机点名及考勤系统</h1>
+
+    <!-- 名单选择区域 -->
+    <div class="list-selection">
+      <h3>名单选择</h3>
+      <label>
+        <input type="radio" name="listType" value="default" checked> 使用默认名单
+      </label>
+      <label>
+        <input type="radio" name="listType" value="import"> 导入 CSV 文件
+      </label>
+      <input type="file" id="csvInput" accept=".csv">
+    </div>
+
+    <!-- 随机点名区域 -->
+    <div class="btn-group">
+      <button id="randomBtn" class="btn">随机点名</button>
+      <span id="currentStudent"></span>
+    </div>
+    <div id="attendanceControls" class="btn-group" style="display:none;">
+      <button onclick="markAttendance('到了')" class="btn">到了</button>
+      <button onclick="markAttendance('没来')" class="btn">没来</button>
+      <button onclick="markAttendance('迟到')" class="btn">迟到</button>
+    </div>
+
+    <!-- 学生名单与请假名单区域 -->
+    <div class="section">
+      <h2>学生名单（请勾选请假的人）</h2>
+      <ul id="studentList"></ul>
+    </div>
+    <div class="section">
+      <h2>请假名单</h2>
+      <ul id="leaveList"></ul>
+    </div>
+
+    <!-- 操作按钮区域 -->
+    <div class="header-actions">
+      <button id="exportBtn" class="btn">导出Excel</button>
+      <button id="refreshBtn" class="btn">刷新签到</button>
+    </div>
+
+    <script>
+      // 默认学生名单
+      const defaultStudents = [
+        "谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐",
+        "李佳音", "丁烁芝", "王宥森", "严浩文", "赖鼎昭", "朱潇瑶",
+        "刘盛邦", "黄润轩", "许梓烁", "杨鑫", "詹伟翔", "章豪斌",
+        "钟晨晖", "丁奕轩", "黄梓城", "彭志泓", "王阳明", "吴承徽",
+        "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣", "吴晓恒",
+        "吴修远", "肖睿", "肖添", "谢家和", "谢润文", "熊昊翔",
+        "熊彦钧", "徐观炼", "徐上", "徐子欣", "许才明", "许君兰",
+        "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯",
+        "杨希凯", "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰",
+        "游璐玮", "于远洋", "余俊翰", "余鑫", "张苇航", "元朗曦",
+        "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇", "张皓昱",
+        "张景翔", "张洛瑜", "张人心", "张若璇", "张文坚", "张文翔",
+        "张相钊", "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶",
+        "张誉方", "张越", "赵施琦", "郑达维", "郑浩翔", "郑皓",
+        "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙", "职雨欣",
+        "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰",
+        "周嘉尉", "周逸", "周雨桐", "周梓枫", "邹书承", "吴永聪",
+        "肖淇", "徐泓昊", "薛炜鹏", "张周骁", "周子健", "常淇博",
+        "陈畅", "陈大有", "陈龙", "陈仁培", "陈思谋", "段玉飞",
+        "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽", "廖雪欣",
+        "林翠敏", "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"
+      ];
+      
+      // 使用 let 声明学生名单，方便后续更新
+      let students = [...defaultStudents];
+
+      // 初始化考勤记录（为空字符串表示未标记）
+      let attendance = {};
+      // 请假状态（false 表示未请假，true 表示请假）
+      let leave = {};
+
+      // 初始化数据
+      function initData() {
+        attendance = {};
+        leave = {};
+        students.forEach(student => {
+          attendance[student] = "";
+          leave[student] = false;
+        });
+      }
+      initData();
+
+      // 渲染学生名单，包含请假复选框
+      function renderStudentList() {
+        const listEl = document.getElementById("studentList");
+        listEl.innerHTML = "";
+        students.forEach(student => {
+          const li = document.createElement("li");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = leave[student];
+          checkbox.onchange = function() {
+            leave[student] = this.checked;
+            renderLeaveList();
+          };
+          li.appendChild(checkbox);
+          li.appendChild(document.createTextNode(student));
+          listEl.appendChild(li);
+        });
+      }
+
+      // 渲染请假名单
+      function renderLeaveList() {
+        const leaveListEl = document.getElementById("leaveList");
+        leaveListEl.innerHTML = "";
+        students.filter(s => leave[s]).forEach(student => {
+          const li = document.createElement("li");
+          li.textContent = student;
+          leaveListEl.appendChild(li);
+        });
+      }
+
+      // 随机点名：仅从非请假且尚未标记出勤状态的学生中选择
+      document.getElementById("randomBtn").onclick = function() {
+        const nonLeave = students.filter(student => !leave[student]);
+        const eligible = nonLeave.filter(student => attendance[student] === "");
+        
+        if(nonLeave.length === 0){
+          document.getElementById("currentStudent").textContent = "没有可点的学生";
+          document.getElementById("attendanceControls").style.display = "none";
+          return;
+        }
+        
+        if(eligible.length === 0){
+          document.getElementById("currentStudent").textContent = "已点完";
+          document.getElementById("attendanceControls").style.display = "none";
+          return;
+        }
+        
+        const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+        document.getElementById("currentStudent").textContent = chosen;
+        document.getElementById("attendanceControls").style.display = "block";
+      };
+
+      // 标记出勤状态
+      function markAttendance(status) {
+        const student = document.getElementById("currentStudent").textContent;
+        if (student) {
+          attendance[student] = status;
+          alert(student + " 的状态已设置为 " + status);
+          document.getElementById("currentStudent").textContent = "";
+          document.getElementById("attendanceControls").style.display = "none";
+        }
+      }
+
+      // 导出考勤数据为 CSV 文件（Excel可打开），添加BOM解决编码问题
+      // 导出时所有学生都显示，若请假则显示“请假”，否则显示出勤状态（未标记显示“未标记”）
+      document.getElementById("exportBtn").onclick = function() {
+        let csvContent = "学生,状态\n";
+        students.forEach(student => {
+          let status = leave[student] ? "请假" : (attendance[student] || "未标记");
+          csvContent += student + "," + status + "\n";
+        });
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "attendance.csv";
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      // 刷新功能：重置所有学生的出勤记录、请假状态以及当前点名信息
+      document.getElementById("refreshBtn").onclick = function() {
+        initData();
+        document.getElementById("currentStudent").textContent = "";
+        document.getElementById("attendanceControls").style.display = "none";
+        renderStudentList();
+        renderLeaveList();
+        alert("新一轮签到已开启，考勤记录及请假名单已重置！");
+      };
+
+      // 名单选择相关逻辑
+      const radioButtons = document.getElementsByName("listType");
+      const csvInput = document.getElementById("csvInput");
+      // 当切换选项时，显示或隐藏文件输入控件
+      radioButtons.forEach(radio => {
+        radio.addEventListener("change", function() {
+          if (this.value === "import") {
+            csvInput.style.display = "block";
+          } else {
+            csvInput.style.display = "none";
+            // 恢复默认名单
+            students = [...defaultStudents];
+            initData();
+            renderStudentList();
+            renderLeaveList();
+          }
+        });
+      });
+
+      // CSV 文件导入逻辑
+      csvInput.addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const text = event.target.result;
+          const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
+          let newList = [];
+          // 如果首行包含"学生"或"姓名"，则跳过
+          if (lines[0].includes("学生") || lines[0].includes("姓名")) {
+            lines.shift();
+          }
+          lines.forEach(line => {
+            // 简单按逗号分隔，取第一个字段作为姓名
+            const fields = line.split(",");
+            if(fields[0].trim()){
+              newList.push(fields[0].trim());
+            }
+          });
+          if(newList.length > 0){
+            students = newList;
+            initData();
+            renderStudentList();
+            renderLeaveList();
+            alert("已导入 " + newList.length + " 个学生！");
+          } else {
+            alert("CSV 文件内容为空或格式不正确！");
+          }
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+
+      // 初始渲染
+      renderStudentList();
+      renderLeaveList();
+    </script>
+  </div>
+</body>
+</html>
