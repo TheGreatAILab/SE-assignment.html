@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>增强版随机点名</title>
   <style>
     body {
       display: flex;
@@ -11,149 +11,176 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 80%;
+      width: 600px;
+    }
+    .buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .primary-btn {
+      background-color: #0f0f0f81;
+      color: white;
+    }
+    .secondary-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    .danger-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    button:hover {
+      opacity: 0.9;
     }
     #result {
       font-size: 2rem;
+      margin: 1.5rem 0;
+      min-height: 3rem;
+      color: #333;
+    }
+    #status {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      color: #666;
+    }
+    #studentList {
+      max-height: 300px;
+      overflow-y: auto;
       margin-top: 1rem;
+      text-align: left;
+      display: none;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+    .student-item {
+      padding: 0.3rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .student-item.picked {
+      background-color: #e8f5e9;
+      font-weight: bold;
+    }
+    .round-info {
+      margin-top: 0.5rem;
+      font-style: italic;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <div class="container">
+    <h1>增强版随机点名系统</h1>
+    
+    <div class="buttons">
+      <button id="pickBtn" class="primary-btn">点名</button>
+      <button id="resetBtn" class="danger-btn">重置</button>
+      <button id="toggleListBtn" class="secondary-btn">显示学生列表</button>
+    </div>
+    
+    <div id="result"></div>
+    <div id="status"></div>
+    
+    <div class="round-info" id="roundInfo">第1轮点名</div>
+    
+    <div id="studentList"></div>
+  </div>
+
   <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
+    const students = ["谢慧豪", "肖金洋", "廖嘉辉", "李锐钊", "罗斯", "沈嘉乐", "李佳音", "丁烁芝", "王宥森", "严浩文", "赖鼎昭", "朱潇瑶", "刘盛邦", "黄润轩", "许梓烁", "杨鑫", "詹伟翔", "章豪斌", "钟晨晖", "丁奕轩", "黄梓城", "彭志泓", "王阳明", "吴承徽", "吴佳霖", "吴乐超", "吴睿", "吴深荣", "吴玟欣", "吴晓恒", "吴修远", "肖睿", "肖添", "谢家和", "谢润文", "熊昊翔", "熊彦钧", "徐观炼", "徐上", "徐子欣", "许才明", "许君兰", "闫麟昊", "阳文轩", "杨凯", "杨立新", "杨铭昊", "杨培凯", "杨希凯", "杨晓乐", "杨正宇", "姚书璟", "姚宇翔", "叶崇杰", "游璐玮", "于远洋", "余俊翰", "余鑫", "张苇航", "元朗曦", "袁舜骐", "岳峻宇", "詹佳烨", "张博然", "张浩宇", "张皓昱", "张景翔", "张洛瑜", "张人心", "张若璇", "张文坚", "张文翔", "张相钊", "张晔", "张逸", "张颖琳", "张宇然", "张玉瑶", "张誉方", "张越", "赵施琦", "郑达维", "郑浩翔", "郑皓", "郑晋凯", "郑思扬", "郑晓丰", "郑鑫宇", "郑芸熙", "职雨欣", "钟泓瑨", "钟俊喆", "钟思玥", "钟旺烜", "周海铭", "周宏杰", "周嘉尉", "周逸", "周雨桐", "周梓枫", "邹书承", "吴永聪", "肖淇", "徐泓昊", "薛炜鹏", "张周骁", "周子健", "常淇博", "陈畅", "陈大有", "陈龙", "陈仁培", "陈思谋", "段玉飞", "古康杰", "郭延庚", "何晓文", "胡泉", "李延泽", "廖雪欣", "林翠敏", "林昀熠", "龙宇海", "卢晓玲", "吕振宁", "郭靖宇"];
+    
+    // 跟踪已被点到的
+    let pickedStudents = new Set();
+    let currentRound = 1;
+
+    const pickBtn = document.getElementById('pickBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const toggleListBtn = document.getElementById('toggleListBtn');
+    const resultDisplay = document.getElementById('result');
+    const statusDisplay = document.getElementById('status');
+    const studentListDiv = document.getElementById('studentList');
+    const roundInfoDiv = document.getElementById('roundInfo');
+
+    function initialize() {
+      updateStatus();
+      renderStudentList();
+    }
+    
+    // 点名功能
+    pickBtn.addEventListener('click', function() {
+      // 检查
+      if (pickedStudents.size >= students.length) {
+        statusDisplay.innerText = "本轮已点完所有学生，请点击重置按钮开始新一轮";
+        return;
+      }
+      
+      let remainingStudents = students.filter(student => !pickedStudents.has(student));
+      let selectedStudent = remainingStudents[Math.floor(Math.random() * remainingStudents.length)];
+
+      pickedStudents.add(selectedStudent);
+      resultDisplay.innerText = selectedStudent;
+      updateStatus();
+      renderStudentList();
+    });
+
+    resetBtn.addEventListener('click', function() {
+      pickedStudents.clear();
+      resultDisplay.innerText = "";
+      currentRound++;
+      roundInfoDiv.innerText = `第${currentRound}轮点名`;
+      updateStatus();
+      renderStudentList();
+    });
+    
+    //学生列表
+    toggleListBtn.addEventListener('click', function() {
+      if (studentListDiv.style.display === "none" || !studentListDiv.style.display) {
+        studentListDiv.style.display = "block";
+        toggleListBtn.innerText = "隐藏学生列表";
+      } else {
+        studentListDiv.style.display = "none";
+        toggleListBtn.innerText = "显示学生列表";
+      }
+    });
+
+    function updateStatus() {
+      let remaining = students.length - pickedStudents.size;
+      statusDisplay.innerText = `已点名: ${pickedStudents.size} / ${students.length} 人，剩余: ${remaining} 人`;
+    }
+
+    function renderStudentList() {
+      studentListDiv.innerHTML = '';
+      students.forEach(student => {
+        const studentItem = document.createElement('div');
+        studentItem.className = 'student-item';
+        if (pickedStudents.has(student)) {
+          studentItem.classList.add('picked');
+        }
+        studentItem.innerText = student;
+        studentListDiv.appendChild(studentItem);
+      });
+    }
+
+    initialize();
   </script>
 </body>
 </html>
