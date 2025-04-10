@@ -3,32 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>软工点名</title>
+    <link rel="icon" href="sysu1.png" type="image/png">
     <style>
         body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; /* 防止滚动条影响效果 */
+        }
+
+        /* 背景图片 */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('sysu2.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* 确保背景在最底层 */
+        }
+
+        /* 内容容器 */
+        .content-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            -webkit-backdrop-filter: blur(3px); /* Safari 支持 */
+            background-color: rgba(255, 255, 255, 0.5); /* 提高透明度 */
             padding: 20px;
-            background: #f5f6fa;
-            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1; /* 确保内容在上层 */
         }
-        
+
+        /* 内容布局 */
+        .content-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 名单部分 */
+        .name-list {
+            width: 40%;
+            padding: 20px;
+        }
+
+        /* 轮盘部分 */
+        .roulette-section {
+            width: 50%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 控制面板 */
         .controls {
             margin: 20px 0;
             display: flex;
             gap: 15px;
             align-items: center;
+            width: 100%;
         }
-        
+
+        /* 名单显示 */
+        #name-display {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            user-select: none;
+        }
+
+        /* 轮盘容器 */
         #roulette-container {
             position: relative;
-            width: 500px;
-            height: 500px;
-            margin: 30px;
+            width: 400px;
+            height: 400px;
+            margin: 20px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             border-radius: 50%;
+            overflow: hidden;
         }
-        
+
         #roulette {
             width: 100%;
             height: 100%;
@@ -39,7 +110,7 @@
             transform: rotate(0deg);
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
-        
+
         #pointer {
             position: absolute;
             top: -15px;
@@ -53,20 +124,8 @@
             z-index: 2;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
-        
-        #name-display {
-            width: 320px;
-            height: 180px;
-            padding: 12px;
-            border: 2px solid #2c3e50;
-            border-radius: 8px;
-            font-size: 16px;
-            background: #f8f9fa;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            user-select: none;
-        }
-        
+
+        /* 按钮样式 */
         button {
             padding: 12px 24px;
             background: #3498db;
@@ -77,24 +136,24 @@
             transition: all 0.3s;
             font-size: 16px;
         }
-        
+
         button:hover {
             background: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
-        
+
         button:disabled {
             background: #95a5a6;
             cursor: not-allowed;
         }
-        
+
         .input-group {
             display: flex;
             gap: 10px;
             align-items: center;
         }
-        
+
         input[type="number"] {
             padding: 10px;
             width: 120px;
@@ -105,23 +164,42 @@
     </style>
 </head>
 <body>
-    <div class="controls">
-        <div class="input-group">
-            <input type="number" id="count" placeholder="抽取人数" min="1">
-            <button onclick="generateInput()">生成名单</button>
+    <!-- 背景图片 -->
+    <div class="background"></div>
+
+    <!-- 内容容器 -->
+    <div class="content-container">
+        <div class="content-wrapper">
+            <!-- 名单部分 -->
+            <div class="name-list">
+                <!-- 控制面板 -->
+                <div class="controls">
+                    <div class="input-group">
+                        <input type="number" id="count" placeholder="抽取人数" min="1">
+                        <button onclick="generateInput()">生成名单</button>
+                    </div>
+                </div>
+                
+                <!-- 名单显示 -->
+                <div id="name-display">点击"生成名单"按钮显示名单</div>
+                
+                <!-- 生成轮盘按钮 -->
+                <button onclick="initRoulette()">生成轮盘</button>
+            </div>
+            
+            <!-- 轮盘部分 -->
+            <div class="roulette-section">
+                <!-- 轮盘容器 -->
+                <div id="roulette-container">
+                    <div id="pointer"></div>
+                    <canvas id="roulette"></canvas>
+                </div>
+                
+                <!-- 开始旋转按钮 -->
+                <button onclick="startLottery()" id="start-btn" disabled>开始旋转</button>
+            </div>
         </div>
     </div>
-    
-    <div id="name-display">点击"生成名单"按钮显示名单</div>
-    
-    <button onclick="initRoulette()">生成轮盘</button>
-    
-    <div id="roulette-container">
-        <div id="pointer"></div>
-        <canvas id="roulette"></canvas>
-    </div>
-    
-    <button onclick="startLottery()" id="start-btn" disabled>开始旋转</button>
 
     <script>
         // 学生名单
@@ -174,7 +252,7 @@
             
             const canvas = document.getElementById('roulette');
             const ctx = canvas.getContext('2d');
-            const size = 500; // 明确定义尺寸
+            const size = 400; // 明确定义尺寸
             
             // 重置轮盘状态
             canvas.style.transition = 'none';
