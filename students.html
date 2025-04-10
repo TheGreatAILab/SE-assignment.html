@@ -2,33 +2,82 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>随机点名（增强版）</title>
   <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+    #result {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin: 1.5rem 0;
+      padding: 1rem 2rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+      text-align: center;
+    }
+    #remaining {
+      font-size: 1.2rem;
+      color: #666;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.8rem;
+      border-radius: 8px;
+    } 
+    input {
+      font-size: 1.1rem;
+      padding: 8px 12px;
+      border: 2px solid #4a90e2;
+      border-radius: 8px;
+      margin-right: 10px;
+      width: 150px;
+      text-align: center;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
     }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
+    button:hover {
+      background: #357abd;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }  body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }  .control-group {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      text-align: center;
+      width: fit-content;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <div class="control-group">
+    <input type="number" id="batchSize" value="1" min="1" max="10" placeholder="每次点几人">
+    <button onclick="pickStudents()">点名</button>
+    <button onclick="resetList()">重置名单</button>
+  </div>
+  <div id="result"></div> <!-- 确保 ID 正确 -->
+  <div id="remaining"></div>
+
   <script>
-    const students = ["谢慧豪",
+    const allStudents = ["谢慧豪",
 "肖金洋",
 "廖嘉辉",
 "李锐钊",
@@ -116,7 +165,7 @@
 "郑思扬",
 "郑晓丰",
 "郑鑫宇",
-"郑芸熙",
+"23336334",
 "职雨欣",
 "钟泓瑨",
 "钟俊喆",
@@ -153,7 +202,50 @@
 "龙宇海",
 "卢晓玲",
 "吕振宁",
-"郭靖宇"];
+"郭靖宇"
+];
+    let remainingStudents = [...allStudents];
+    let pickedStudents = [];
+
+    function pickStudents() {
+      const batchSize = parseInt(document.getElementById('batchSize').value) || 1;
+      const results = [];
+      
+      if (remainingStudents.length === 0) {
+        updateDisplay("所有同学已点完！点击重置继续");
+        return;
+      }
+
+      const pickCount = Math.min(batchSize, remainingStudents.length);
+      for (let i = 0; i < pickCount; i++) {
+        const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+        const student = remainingStudents.splice(randomIndex, 1)[0];
+        pickedStudents.push(student);
+        results.push(student);
+      }
+
+      updateDisplay(results.join("，")); // 确保传递有效文本
+      updateRemainingCount();
+    }
+
+    function resetList() {
+      remainingStudents = [...allStudents];
+      pickedStudents = [];
+      updateDisplay("名单已重置");
+      updateRemainingCount();
+    }
+
+    function updateDisplay(text) {
+      document.getElementById('result').innerText = text; // 确保元素存在
+    }
+
+    function updateRemainingCount() {
+      document.getElementById('remaining').innerText = 
+        `剩余未点：${remainingStudents.length}人，已点：${pickedStudents.length}人`;
+    }
+
+    // 初始化显示
+    updateRemainingCount();
   </script>
 </body>
 </html>
