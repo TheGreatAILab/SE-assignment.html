@@ -42,10 +42,28 @@
       font-size: 2rem;
       margin-top: 1rem;
     }
+    @keyframes pop {
+    0% {
+    transform: scale(0.5);
+    opacity: 0;
+    }
+    50% {
+    transform: scale(1.3);
+    opacity: 1;
+    }
+    100% {
+    transform: scale(1);
+    }
+    }
+
+  #result.animate {
+  animation: pop 0.5s ease;
+  }
+
   </style>
 </head>
 <body>
-  <button onclick="playSound();document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <button onclick="playSound();starRoll();document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
     点名
   </button>
   <p id="result"></p>
@@ -191,6 +209,29 @@
         console.log('音效播放失败:', error);
       });
     }
+
+    function startRoll() {
+  playSound();
+
+  const result = document.getElementById('result');
+  let times = 30; // 滚动次数
+  let i = 0;
+
+  const interval = setInterval(() => {
+    const randomName = students[Math.floor(Math.random() * students.length)];
+    /*result.innerText = randomName;*/
+    result.classList.remove('animate');
+  void result.offsetWidth; // 触发重绘以重播动画
+  result.innerText = randomName;
+  result.classList.add('animate');
+
+    i++;
+    if (i >= times) {
+      clearInterval(interval); // 停止滚动
+    }
+  }, 100); // 每100ms换一次
+}
+    
   </script>
 </body>
 </html>
