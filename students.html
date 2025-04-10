@@ -4,29 +4,79 @@
   <meta charset="UTF-8">
   <title>随机点名</title>
   <style>
+    /* 定义字体 */
+    @font-face { /*加入字体*/
+      font-family: "ShangShouJifeng";
+      src: url("fonts/No.18-上首疾风书法体.ttf") format("truetype");
+    }
     body {
+      /*font-family: "ShangShouJifeng", cursive; /*更改字体*/
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+
+      background-image: url("images/background.jpg"); /* 设置背景图 */
+      background-size: cover; /* 让背景图铺满 */
+      background-position: center; /* 居中 */
+      background-repeat: no-repeat; /* 不重复 */
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      /*font-family: "ShangShouJifeng", cursive; /*更改字体*/
+      font-size: 3rem;
+      padding: 5rem 10rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);/*阴影*/
+      border-radius: 1rem;
+
+
+       background-image: url("images/button.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      color: white;         /* 文字颜色 */
+      border: none;         /* 去掉边框 */
+      cursor: pointer;      /* 鼠标指针变成小手 */
     }
     #result {
+      /*font-family: "ShangShouJifeng", cursive; /*更改字体*/
       font-size: 2rem;
       margin-top: 1rem;
     }
+    @keyframes pop {
+    0% {
+    transform: scale(0.5);
+    opacity: 0;
+    }
+    50% {
+    transform: scale(1.3);
+    opacity: 1;
+    }
+    100% {
+    transform: scale(1);
+    }
+    }
+
+  #result.animate {
+  animation: pop 0.5s ease;
+  }
+
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <!--<button onclick="playSound();startRoll();document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">-->
+  <button onclick="startRoll()">
     点名
   </button>
   <p id="result"></p>
+  
+  <!-- 音效标签 -->
+  <audio id="click"> 
+    <source src="sounds/click.mp3" type="audio/mpeg">
+  </audio>
+  
   <script>
     const students = ["谢慧豪",
 "肖金洋",
@@ -154,6 +204,38 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    
+// 播放音效函数
+    function playSound() {
+      const audio = document.getElementById('click');
+      audio.currentTime = 0;
+      audio.play().catch(error => {
+        console.log('音效播放失败:', error);
+      });
+    }
+
+    function startRoll() {
+  playSound();
+
+  const result = document.getElementById('result');
+  let times =10 ; // 滚动次数
+  let i = 0;
+
+  const interval = setInterval(() => {
+    const randomName = students[Math.floor(Math.random() * students.length)];
+    /*result.innerText = randomName;*/
+    result.classList.remove('animate');
+  void result.offsetWidth; // 触发重绘以重播动画
+  result.innerText = randomName;
+  result.classList.add('animate');
+
+    i++;
+    if (i >= times) {
+      clearInterval(interval); // 停止滚动
+    }
+  }, 20); // 每100ms换一次
+}
+    
   </script>
 </body>
 </html>
