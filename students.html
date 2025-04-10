@@ -163,7 +163,7 @@
     
 // 播放音效函数
     function playSound() {
-      const audio = document.getElementById('click-sound');
+      const audio = document.getElementById('click');
       audio.currentTime = 0;
       audio.play().catch(error => {
         console.log('音效播放失败:', error);
