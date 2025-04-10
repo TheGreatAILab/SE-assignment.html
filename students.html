@@ -23,10 +23,16 @@
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <button onclick="playSound();document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
     点名
   </button>
   <p id="result"></p>
+  
+  <!-- 音效标签 -->
+  <audio id="click-sound">
+    <source src="sounds/click.mp3" type="audio/mpeg">
+  </audio>
+  
   <script>
     const students = ["谢慧豪",
 "肖金洋",
@@ -67,7 +73,7 @@
 "熊彦钧",
 "徐观炼",
 "徐上",
-"23336269",
+"徐子欣",
 "许才明",
 "许君兰",
 "闫麟昊",
@@ -154,6 +160,15 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    
+// 播放音效函数
+    function playSound() {
+      const audio = document.getElementById('click-sound');
+      audio.currentTime = 0;
+      audio.play().catch(error => {
+        console.log('音效播放失败:', error);
+      });
+    }
   </script>
 </body>
 </html>
