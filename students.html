@@ -92,14 +92,15 @@
         /* 轮盘容器 */
         #roulette-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 600px; /* 增大宽度 */
+            height: 600px; /* 增大高度 */
             margin: 20px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             border-radius: 50%;
             overflow: hidden;
         }
 
+        /* 画布 */
         #roulette {
             width: 100%;
             height: 100%;
@@ -111,6 +112,7 @@
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
+        /* 指针 */
         #pointer {
             position: absolute;
             top: -15px;
@@ -228,13 +230,41 @@
         let originalNames = [];
         let isRouletteDirty = false;
 
+        // 生成真随机数
+        function generateTrueRandom() {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            return array[0] / 0xFFFFFFFF; // 将随机数转换为 [0, 1) 范围
+        }
+
+        // Fisher-Yates 洗牌算法
+        function shuffleArray(array, randomFunc) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(randomFunc() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
         // 生成随机名单
         function generateInput() {
             if (isAnimating) return alert("请等待旋转完成");
-            const count = Math.min(parseInt(document.getElementById('count').value), students.length);
-            if (!count || count < 1) return alert("请输入有效人数");
             
-            const newNames = [...students].sort(() => Math.random() - 0.5).slice(0, count);
+            const count = parseInt(document.getElementById('count').value);
+            const maxCount = students.length;
+            
+            if (isNaN(count) || count < 1) {
+                return alert("请输入有效人数");
+            }
+            
+            if (count > maxCount) {
+                alert(`输入人数超过最大值（${maxCount}），请重新输入！`);
+                count = maxCount;
+            }
+            
+            // 使用 Fisher-Yates 洗牌算法和真随机数生成器
+            const newNames = shuffleArray([...students], generateTrueRandom).slice(0, count);
             if (JSON.stringify(newNames) === JSON.stringify(originalNames)) return;
             
             currentNames = newNames;
@@ -324,37 +354,39 @@
             ctx.restore();
         }
 
-	// 开始旋转
-	function startLottery() {
-    	    if (isAnimating || isRouletteDirty) return;
-    
+        // 开始旋转
+        function startLottery() {
+            if (isAnimating || isRouletteDirty) return;
+            
             const roulette = document.getElementById('roulette');
-    
-    	    // 重置轮盘到初始状态
-    	    roulette.style.transition = 'none';
-    	    roulette.style.transform = 'rotate(0deg)';
-     	    void roulette.offsetWidth; // 强制重绘，确保重置完成
-    
-     	    // 设置过渡动画
-     	    setTimeout(() => {
-            	roulette.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-        
-         	// 计算新的旋转角度（每次旋转4-5圈）
-         	const target = 1440 + Math.random() * 360;
-        
-         	// 应用新的旋转角度
-         	roulette.style.transform = `rotate(-${target}deg)`;
-        
-         	isAnimating = true;
-         	updateButtonStates();
-        
-         	// 监听动画结束
-         	roulette.addEventListener('transitionend', () => {
-             	    isAnimating = false;
-             	    updateButtonStates();
-         	    }, { once: true });
-     	    }, 50);
-	}
+            
+            // 重置轮盘到初始状态
+            roulette.style.transition = 'none';
+            roulette.style.transform = 'rotate(0deg)';
+            void roulette.offsetWidth; // 强制重绘，确保重置完成
+            
+            // 设置过渡动画
+            setTimeout(() => {
+                roulette.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                
+                // 使用真随机数生成器计算新的旋转角度
+                const baseRotation = 1800; // 5圈
+                const randomRotation = generateTrueRandom() * 720; // 0到2圈的随机角度
+                const target = baseRotation + randomRotation;
+                
+                // 应用新的旋转角度
+                roulette.style.transform = `rotate(-${target}deg)`;
+                
+                isAnimating = true;
+                updateButtonStates();
+                
+                // 监听动画结束
+                roulette.addEventListener('transitionend', () => {
+                    isAnimating = false;
+                    updateButtonStates();
+                }, { once: true });
+            }, 50);
+        }
 
         // 状态管理函数
         function updateButtonStates() {
