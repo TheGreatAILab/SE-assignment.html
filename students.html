@@ -15,22 +15,23 @@
     button {
       font-size: 2rem;
       padding: 1rem 2rem;
+	margin-bottom: 1rem;
     }
     #result {
       font-size: 2rem;
       margin-top: 1rem;
     }
     input {
-      font_size: 2rem;
+      font-size: 2rem;
       width: 100px;
       text-align: center;
-      margin_bottn: 1rem;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-  <input type="number" id="count" value="1" min="1" max="100">
-  <button onclick="selectStudents()]">
+  <input type="number" id="count" value="1" min="1">
+  <button onclick="selectStudents()">
     点名
   </button>
   <p id="result"></p>
@@ -161,23 +162,30 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
-    const Input=document.getElementById('count');
-    function selectStudents()
-      {
-        let num=parseInt(Input.value);
-        num=Math.max(1,Math.min(num,students.length));
-        if(num<=0)reutrn [];
-        const temp=[...students];
-        const selected=[];
-        for (let i=0;i<num;i++)
-          {
-            const randomIndex=Math.floor(Math.random()*temp.length);
-            seleted.push(temp.slice(randomIndex,1)[0])
-          }
-        return selected;
-        const resultElement=document.getElementById('result')
-        resultElement.innerText=selected.join(', ')
+	const input=document.getElementById('count');
+	input.max=students.length;
+  function selectStudents(){
+	if(students.length<=0)
+	{
+		alert("请上传学生名单");
+		return ;
+	}
+  let num=parseInt(input.value);
+	if(num>students.length)
+	{
+		alert("人数超出上限");
+		return;
+	}
+    num=Math.max(1,Math.min(num,students.length));
+    const temp=[...students];
+    const selected=[];
+    for (let i=0;i<num;i++){
+        const randomIndex=Math.floor(Math.random()*temp.length);
+        selected.push(temp.splice(randomIndex,1)[0]);
       }
+    const resultElement=document.getElementById('result');
+    resultElement.innerText=selected.join(', ');
+  }
   </script>
 </body>
 </html>
