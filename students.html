@@ -20,6 +20,15 @@
       font-size: 2rem;
       margin-top: 1rem;
     }
+    /* 应用于移动设备的属性 */
+    .mobile button {
+      font-size: 6rem;
+      padding: 3rem 6rem;
+    }
+    .mobile #result {
+      font-size: 6rem;
+      margin-top: 3rem;
+    }
   </style>
 </head>
 <body>
@@ -154,6 +163,17 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+
+    // 检测打开网页的是否是移动设备
+    function detectMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    // 网页加载时运行检测
+    window.onload = function () {
+      if (detectMobile()) {
+        document.documentElement.classList.add('mobile');
+      }
+    };
   </script>
 </body>
 </html>
