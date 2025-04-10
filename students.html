@@ -20,10 +20,17 @@
       font-size: 2rem;
       margin-top: 1rem;
     }
+    input {
+      font_size: 2rem;
+      width: 100px;
+      text-align: center;
+      margin_bottn: 1rem;
+    }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <input type="number" id="count" value="1" min="1" max="100">
+  <button onclick="selectStudents()]">
     点名
   </button>
   <p id="result"></p>
@@ -154,6 +161,23 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    const Input=document.getElementById('count');
+    function selectStudents()
+      {
+        let num=parseInt(Input.value);
+        num=Math.max(1,Math.min(num,students.length));
+        if(num<=0)reutrn [];
+        const temp=[...students];
+        const selected=[];
+        for (let i=0;i<num;i++)
+          {
+            const randomIndex=Math.floor(Math.random()*temp.length);
+            seleted.push(temp.slice(randomIndex,1)[0])
+          }
+        return selected;
+        const resultElement=document.getElementById('result')
+        resultElement.innerText=selected.join(', ')
+      }
   </script>
 </body>
 </html>
