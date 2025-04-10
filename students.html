@@ -1,34 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>随机点名</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>随机点名</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        button {
+            font-size: 2rem;
+            padding: 1rem 2rem;
+            margin: 1rem;
+            border: 2px solid #333;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        #result {
+            font-size: 2rem;
+            margin-top: 1rem;
+        }
+
+        #history {
+            margin-top: 1rem;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            background-color: white;
+            z-index: 1;
+        }
+
+       .top-left {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+
+       .toggle-btn {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
 </head>
+
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
+    <div class="top-left">
+        <button id="toggleHistoryBtn" class="toggle-btn">点名记录</button>
+    </div>
+    <button id="rollCallBtn">点名</button>
+    <p id="result"></p>
+    <div id="attendance-buttons">
+        <button onclick="markAttendance('出勤')">出勤</button>
+        <button onclick="markAttendance('缺勤')">缺勤</button>
+    </div>
+    <div id="history">
+        <div class="flex justify-between items-center">
+            <h3>点名记录</h3>
+            <div>
+                <i class="fa-solid fa-minus cursor-pointer" id="minimizeHistory"></i>
+                <i class="fa-solid fa-xmark cursor-pointer" id="closeHistory"></i>
+            </div>
+        </div>
+    </div>
+    <script>
+        const students = ["谢慧豪",
 "肖金洋",
 "廖嘉辉",
 "李锐钊",
@@ -154,6 +207,72 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
-  </script>
+        let availableStudents = [...students];
+        const calledStudents = [];
+        const historyElement = document.getElementById('history');
+        const resultElement = document.getElementById('result');
+        const rollCallBtn = document.getElementById('rollCallBtn');
+        const toggleHistoryBtn = document.getElementById('toggleHistoryBtn');
+        const synth = window.speechSynthesis;
+        let currentStudent = null;
+        const attendance = {};
+        students.forEach(student => attendance[student] = null);
+
+        rollCallBtn.addEventListener('click', function () {
+            if (availableStudents.length === 0) {
+                availableStudents = [...students];
+            }
+            const randomIndex = Math.floor(Math.random() * availableStudents.length);
+            currentStudent = availableStudents.splice(randomIndex, 1)[0];
+            calledStudents.push(currentStudent);
+            resultElement.innerText = `本次点名：${currentStudent}`;
+            const utterance = new SpeechSynthesisUtterance(currentStudent);
+            synth.speak(utterance);
+            const now = new Date().toLocaleString();
+            const historyItem = document.createElement('p');
+            historyItem.textContent = `${now}: ${currentStudent}（出勤）`;
+            historyElement.appendChild(historyItem);
+        });
+
+        function markAttendance(status) {
+            if (currentStudent!== null) {
+                attendance[currentStudent] = status;
+                const historyItems = historyElement.querySelectorAll('p');
+                for (let i = 0; i < historyItems.length; i++) {
+                    if (historyItems[i].textContent.includes(currentStudent)) {
+                        historyItems[i].textContent = historyItems[i].textContent.replace('出勤', status);
+                        break;
+                    }
+                }
+                currentStudent = null;
+            }
+        }
+
+
+        toggleHistoryBtn.addEventListener('click', function () {
+            const history = document.getElementById('history');
+            if (history.style.display === 'none') {
+                history.style.display = 'block';
+            } else {
+                history.style.display = 'none';
+            }
+        });
+
+        const minimizeHistory = document.getElementById('minimizeHistory');
+        const closeHistory = document.getElementById('closeHistory');
+        minimizeHistory.addEventListener('click', function () {
+            const history = document.getElementById('history');
+            if (history.style.maxHeight === '30px') {
+                history.style.maxHeight = '200px';
+            } else {
+                history.style.maxHeight = '30px';
+            }
+        });
+
+        closeHistory.addEventListener('click', function () {
+            const history = document.getElementById('history');
+            history.style.display = 'none';
+        });
+    </script>
 </body>
 </html>
