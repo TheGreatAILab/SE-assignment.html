@@ -19,7 +19,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('sysu2.jpg');
+            background-image: url('sysu2.jpg'); /* 替换为你的背景图片路径 */
             background-size: cover;
             background-position: center;
             z-index: -1; /* 确保背景在最底层 */
@@ -324,22 +324,37 @@
             ctx.restore();
         }
 
-        // 开始旋转
-        function startLottery() {
-            if (isAnimating || isRouletteDirty) return;
-            
+	// 开始旋转
+	function startLottery() {
+    	    if (isAnimating || isRouletteDirty) return;
+    
             const roulette = document.getElementById('roulette');
-            const target = 1440 + Math.random() * 360; // 4-5圈随机角度
-            
-            isAnimating = true;
-            updateButtonStates();
-            
-            roulette.style.transform = `rotate(-${target}deg)`;
-            roulette.addEventListener('transitionend', () => {
-                isAnimating = false;
-                updateButtonStates();
-            }, { once: true });
-        }
+    
+    	    // 重置轮盘到初始状态
+    	    roulette.style.transition = 'none';
+    	    roulette.style.transform = 'rotate(0deg)';
+     	    void roulette.offsetWidth; // 强制重绘，确保重置完成
+    
+     	    // 设置过渡动画
+     	    setTimeout(() => {
+            	roulette.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+        
+         	// 计算新的旋转角度（每次旋转4-5圈）
+         	const target = 1440 + Math.random() * 360;
+        
+         	// 应用新的旋转角度
+         	roulette.style.transform = `rotate(-${target}deg)`;
+        
+         	isAnimating = true;
+         	updateButtonStates();
+        
+         	// 监听动画结束
+         	roulette.addEventListener('transitionend', () => {
+             	    isAnimating = false;
+             	    updateButtonStates();
+         	    }, { once: true });
+     	    }, 50);
+	}
 
         // 状态管理函数
         function updateButtonStates() {
