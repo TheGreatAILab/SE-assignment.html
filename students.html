@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <title>随机点名</title>
   <style>
+    /* 定义字体 */
+    @font-face { //加入字体
+      font-family: "ShangShouJifeng";
+      src: url("fonts/No.18-上首疾风书法体.ttf") format("truetype");
+    }
     body {
+      font-family: "ShangShouJifeng", cursive; //更改字体
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -13,10 +19,12 @@
       margin: 0;
     }
     button {
+      font-family: "ShangShouJifeng", cursive; //更改字体
       font-size: 2rem;
       padding: 1rem 2rem;
     }
     #result {
+      font-family: "ShangShouJifeng", cursive; //更改字体
       font-size: 2rem;
       margin-top: 1rem;
     }
@@ -29,7 +37,7 @@
   <p id="result"></p>
   
   <!-- 音效标签 -->
-  <audio id="click">
+  <audio id="click"> //加入音效
     <source src="sounds/click.mp3" type="audio/mpeg">
   </audio>
   
