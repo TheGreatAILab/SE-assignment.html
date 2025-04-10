@@ -1,159 +1,287 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能课堂管理系统</title>
   <style>
+    /* 基础样式 */
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: '微软雅黑', Arial, sans-serif;
+      background: #f0f2f5;
       margin: 0;
+      padding: 20px;
     }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
+
+    /* 点名按钮样式 */
+    #pickBtn {
+      background: #409eff;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 20px 0;
+    }
+
+    #pickBtn:hover {
+      background: #66b1ff;
+      transform: translateY(-2px);
+    }
+
+    /* 结果显示 */
     #result {
-      font-size: 2rem;
-      margin-top: 1rem;
+      font-size: 24px;
+      color: #303133;
+      margin: 20px 0;
+      min-height: 40px;
+    }
+
+    /* 控制面板 */
+    .control-panel {
+      border: 1px solid #ebeef5;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    input[type="text"], 
+    input[type="file"] {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    /* 学生列表 */
+    #studentList {
+      margin-top: 20px;
+    }
+
+    #studentList ul {
+      list-style: none;
+      padding: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .student-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #ebeef5;
+      transition: background 0.3s;
+    }
+
+    .student-item:hover {
+      background: #f5f7fa;
+    }
+
+    .delete-btn {
+      background: #f56c6c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      line-height: 24px;
+    }
+
+    /* 操作按钮 */
+    .action-btn {
+      background: #67c23a;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    .danger-btn {
+      background: #f56c6c;
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <div class="container">
+    <h1>课堂管理系统 v2.0</h1>
+    
+    <!-- 点名模块 -->
+    <div class="rollcall-section">
+      <button id="pickBtn" onclick="pickStudent()">🎯 随机点名</button>
+      <div id="result"></div>
+    </div>
+
+    <!-- 学生管理模块 -->
+    <div class="control-panel">
+      <h2>学生管理</h2>
+      
+      <div class="input-group">
+        <input type="file" id="fileInput" accept=".csv" hidden>
+        <button class="action-btn" onclick="document.getElementById('fileInput').click()">
+          📁 导入CSV
+        </button>
+        <input type="text" id="studentInput" placeholder="输入姓名/学号">
+        <button class="action-btn" onclick="addStudent()">➕ 添加</button>
+        <button class="action-btn danger-btn" onclick="deleteStudent()">🗑️ 删除</button>
+        <button class="action-btn danger-btn" onclick="clearAll()">♻️ 清空</button>
+      </div>
+
+      <div id="studentList">
+        <h3>当前名单（共<span id="count">0</span>人）</h3>
+        <ul id="list"></ul>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"23336302",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
+    // 初始化学生数组
+    let students = JSON.parse(localStorage.getItem('students')) || [];
+    let remainingStudents = [...students];
+
+    // 初始化显示
+    function refreshList() {
+      const listElement = document.getElementById('list');
+      listElement.innerHTML = students
+        .map(student => `
+          <li class="student-item">
+            <span>${student}</span>
+            <button class="delete-btn" onclick="removeSingle('${student}')">×</button>
+          </li>
+        `)
+        .join('');
+      
+      document.getElementById('count').textContent = students.length;
+      localStorage.setItem('students', JSON.stringify(students));
+    }
+
+    // 文件导入功能
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const newStudents = e.target.result
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0);
+        
+        // 合并并去重
+        students = [...new Set([...students, ...newStudents])];
+        remainingStudents = [...students];
+        refreshList();
+        alert(`成功导入 ${newStudents.length} 条记录，当前总数：${students.length}`);
+      };
+      
+      reader.readAsText(file);
+    });
+
+    // 添加学生
+    function addStudent() {
+      const input = document.getElementById('studentInput').value.trim();
+      if (!input) return;
+
+      if (!students.includes(input)) {
+        students.push(input);
+        remainingStudents.push(input);
+        refreshList();
+        document.getElementById('studentInput').value = '';
+      } else {
+        alert('该学生已存在！');
+      }
+    }
+
+    // 删除学生
+    function deleteStudent() {
+      const input = document.getElementById('studentInput').value.trim();
+      if (!input) return;
+
+      const index = students.findIndex(s => s.includes(input));
+      if (index === -1) {
+        alert('未找到该学生');
+        return;
+      }
+      
+      students.splice(index, 1);
+      remainingStudents = remainingStudents.filter(s => s !== students[index]);
+      refreshList();
+    }
+
+    // 清空名单
+    function clearAll() {
+      if (confirm('确认清空所有学生数据？此操作不可恢复！')) {
+        students = [];
+        remainingStudents = [];
+        refreshList();
+      }
+    }
+
+    // 单条删除
+    function removeSingle(name) {
+      students = students.filter(s => s !== name);
+      remainingStudents = remainingStudents.filter(s => s !== name);
+      refreshList();
+    }
+
+    // 随机点名功能
+    function pickStudent() {
+      if (remainingStudents.length === 0) {
+        if (!confirm('所有学生已点完，是否重新开始？')) return;
+        remainingStudents = [...students];
+      }
+
+      const index = Math.floor(Math.random() * remainingStudents.length);
+      const picked = remainingStudents.splice(index, 1)[0];
+      
+      document.getElementById('result').innerHTML = `
+        <span style="color:#409eff">🎉 本次点到：</span>
+        <strong style="font-size:1.2em">${picked}</strong>
+      `;
+      
+      // 添加动画效果
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.animation = 'none';
+      resultDiv.offsetHeight; // 触发重绘
+      resultDiv.style.animation = 'blink 0.5s 2';
+    }
+
+    // 初始化显示
+    window.onload = refreshList;
+
+    // 动画定义
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes blink {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
