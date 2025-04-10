@@ -23,9 +23,12 @@
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
+  <div class="buttons">
+    <button onclick="pickStudent()">点名</button>
+    <button onclick="markAbsentAndPick()">登记缺勤并点名</button>
+    <button onclick="exportAbsentList()">导出缺勤名单</button>
+    <button onclick="clearAbsentList()">清空缺勤列表</button>
+  </div>
   <p id="result"></p>
   <script>
     const students = ["谢慧豪",
@@ -154,6 +157,33 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    let absentStudents = [];
+    let currentStudent = "";
+
+    function pickStudent() {
+      currentStudent = students[Math.floor(Math.random() * students.length)];
+      document.getElementById('result').innerText = currentStudent;
+    }
+
+    function markAbsentAndPick() {
+      if (currentStudent && !absentStudents.includes(currentStudent)) {
+        absentStudents.push(currentStudent);
+      }
+      pickStudent();
+    }
+
+    function exportAbsentList() {
+      const blob = new Blob([absentStudents.join('\n')], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'absent_students.txt';
+      a.click();
+    }
+
+    function clearAbsentList() {
+      absentStudents = [];
+      alert("缺勤列表已清空！");
+    }
   </script>
 </body>
 </html>
