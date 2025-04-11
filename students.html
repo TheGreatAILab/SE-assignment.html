@@ -1,159 +1,278 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>随机点名</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
-    }
-    #result {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-  </style>
+    <title>智能课堂点名器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;  /* 使用Arial字体 */
+            padding: 20px;                  /* 页面内边距 */
+            max-width: 600px;               /* 页面最大宽度 */
+            margin: 0 auto;                 /* 居中显示 */
+        }
+
+        #studentData { 
+            margin: 20px 0;                 /* 上下外边距20px */
+            padding: 10px;                  /* 内边距10px */
+            border: 1px solid #ccc;         /* 浅灰色边框 */
+        }
+
+        button {
+            padding: 10px 20px;             /* 按钮内边距 */
+            background-color: #4CAF50;      /* 绿色背景 */
+            color: white;                   /* 白色文字 */
+            border: none;                   /* 无边框 */
+            cursor: pointer;                /* 鼠标悬停显示手型 */
+        }
+
+        button:hover {
+            background-color: #45a049;      /* 深绿色背景 */
+        }
+
+        .absent {
+        background-color: #f44336; /* 红色 */
+        }
+    </style>
 </head>
+
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
-  </script>
+    <h1>智能课堂点名器</h1>
+
+    <button onclick="startRollCall()">开始智能点名</button>
+
+    <input type="file" id="fileInput" onchange="importData()">
+    
+    <button onclick="exportData()">导出数据</button>
+
+    <div id="result" style="margin-top: 20px; font-size: 24px;"></div>
+
+    <div id="studentData"></div>
+
+    <script>
+        // 示例学生数据（包含姓名、出勤、作业和课堂状态）
+    let students = [
+        { "name": "谢慧豪", "attendance": 9, "homework": 87, "classStatus": [] },
+        { "name": "肖金洋", "attendance": 2, "homework": 70, "classStatus": [] },
+        { "name": "廖嘉辉", "attendance": 8, "homework": 85, "classStatus": [] },
+        { "name": "李锐钊", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "罗斯", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "沈嘉乐", "attendance": 9, "homework": 96, "classStatus": [] },
+        { "name": "李佳音", "attendance": 8, "homework": 88, "classStatus": [] },
+        { "name": "丁烁芝", "attendance": 10, "homework": 90, "classStatus": [] },
+        { "name": "王宥森", "attendance": 9, "homework": 83, "classStatus": [] },
+        { "name": "严浩文", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "赖鼎昭", "attendance": 10, "homework": 84, "classStatus": [] },
+        { "name": "朱潇瑶", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "刘盛邦", "attendance": 8, "homework": 89, "classStatus": [] },
+        { "name": "黄润轩", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "许梓烁", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "杨鑫", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "詹伟翔", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "章豪斌", "attendance": 9, "homework": 98, "classStatus": [] },
+        { "name": "钟晨晖", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "丁奕轩", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "黄梓城", "attendance": 9, "homework": 100, "classStatus": [] },
+        { "name": "彭志泓", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "王阳明", "attendance": 10, "homework": 88, "classStatus": [] },
+        { "name": "吴承徽", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "吴佳霖", "attendance": 8, "homework": 84, "classStatus": [] },
+        { "name": "吴乐超", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "吴睿", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "吴深荣", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "吴玟欣", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "吴晓恒", "attendance": 9, "homework": 89, "classStatus": [] },
+        { "name": "吴修远", "attendance": 8, "homework": 96, "classStatus": [] },
+        { "name": "肖睿", "attendance": 10, "homework": 83, "classStatus": [] },
+        { "name": "肖添", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "谢家和", "attendance": 8, "homework": 87, "classStatus": [] },
+        { "name": "谢润文", "attendance": 10, "homework": 92, "classStatus": [] },
+        { "name": "熊昊翔", "attendance": 9, "homework": 85, "classStatus": [] },
+        { "name": "熊彦钧", "attendance": 8, "homework": 98, "classStatus": [] },
+        { "name": "徐观炼", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "徐上", "attendance": 9, "homework": 90, "classStatus": [] },
+        { "name": "徐子欣", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "许才明", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "许君兰", "attendance": 9, "homework": 100, "classStatus": [] },
+        { "name": "闫麟昊", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "阳文轩", "attendance": 10, "homework": 88, "classStatus": [] },
+        { "name": "杨凯", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "杨立新", "attendance": 8, "homework": 84, "classStatus": [] },
+        { "name": "杨铭昊", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "杨培凯", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "杨希凯", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "杨晓乐", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "杨正宇", "attendance": 9, "homework": 89, "classStatus": [] },
+        { "name": "姚书璟", "attendance": 8, "homework": 96, "classStatus": [] },
+        { "name": "姚宇翔", "attendance": 10, "homework": 83, "classStatus": [] },
+        { "name": "叶崇杰", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "游璐玮", "attendance": 8, "homework": 87, "classStatus": [] },
+        { "name": "于远洋", "attendance": 10, "homework": 92, "classStatus": [] },
+        { "name": "余俊翰", "attendance": 9, "homework": 85, "classStatus": [] },
+        { "name": "余鑫", "attendance": 8, "homework": 98, "classStatus": [] },
+        { "name": "张苇航", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "元朗曦", "attendance": 9, "homework": 90, "classStatus": [] },
+        { "name": "袁舜骐", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "岳峻宇", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "詹佳烨", "attendance": 9, "homework": 100, "classStatus": [] },
+        { "name": "张博然", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "张浩宇", "attendance": 10, "homework": 88, "classStatus": [] },
+        { "name": "张皓昱", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "张景翔", "attendance": 8, "homework": 84, "classStatus": [] },
+        { "name": "张洛瑜", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "张人心", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "张若璇", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "张文坚", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "张文翔", "attendance": 9, "homework": 89, "classStatus": [] },
+        { "name": "张相钊", "attendance": 8, "homework": 96, "classStatus": [] },
+        { "name": "张晔", "attendance": 10, "homework": 83, "classStatus": [] },
+        { "name": "张逸", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "张颖琳", "attendance": 8, "homework": 87, "classStatus": [] },
+        { "name": "张宇然", "attendance": 10, "homework": 92, "classStatus": [] },
+        { "name": "张玉瑶", "attendance": 9, "homework": 85, "classStatus": [] },
+        { "name": "张誉方", "attendance": 8, "homework": 98, "classStatus": [] },
+        { "name": "张越", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "赵施琦", "attendance": 9, "homework": 90, "classStatus": [] },
+        { "name": "郑达维", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "郑浩翔", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "郑皓", "attendance": 9, "homework": 100, "classStatus": [] },
+        { "name": "郑晋凯", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "郑思扬", "attendance": 10, "homework": 88, "classStatus": [] },
+        { "name": "郑晓丰", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "郑鑫宇", "attendance": 8, "homework": 84, "classStatus": [] },
+        { "name": "郑芸熙", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "职雨欣", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "钟泓瑨", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "钟俊喆", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "钟思玥", "attendance": 9, "homework": 89, "classStatus": [] },
+        { "name": "钟旺烜", "attendance": 8, "homework": 96, "classStatus": [] },
+        { "name": "周海铭", "attendance": 10, "homework": 83, "classStatus": [] },
+        { "name": "周宏杰", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "周嘉尉", "attendance": 8, "homework": 87, "classStatus": [] },
+        { "name": "周逸", "attendance": 10, "homework": 92, "classStatus": [] },
+        { "name": "周雨桐", "attendance": 9, "homework": 85, "classStatus": [] },
+        { "name": "周梓枫", "attendance": 8, "homework": 98, "classStatus": [] },
+        { "name": "邹书承", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "吴永聪", "attendance": 9, "homework": 90, "classStatus": [] },
+        { "name": "肖淇", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "徐泓昊", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "薛炜鹏", "attendance": 9, "homework": 100, "classStatus": [] },
+        { "name": "张周骁", "attendance": 8, "homework": 97, "classStatus": [] },
+        { "name": "周子健", "attendance": 10, "homework": 88, "classStatus": [] },
+        { "name": "常淇博", "attendance": 9, "homework": 91, "classStatus": [] },
+        { "name": "陈畅", "attendance": 8, "homework": 84, "classStatus": [] },
+        { "name": "陈大有", "attendance": 10, "homework": 93, "classStatus": [] },
+        { "name": "陈龙", "attendance": 9, "homework": 86, "classStatus": [] },
+        { "name": "陈仁培", "attendance": 8, "homework": 95, "classStatus": [] },
+        { "name": "陈思谋", "attendance": 10, "homework": 82, "classStatus": [] },
+        { "name": "段玉飞", "attendance": 9, "homework": 89, "classStatus": [] },
+        { "name": "古康杰", "attendance": 8, "homework": 96, "classStatus": [] },
+        { "name": "郭延庚", "attendance": 10, "homework": 83, "classStatus": [] },
+        { "name": "何晓文", "attendance": 9, "homework": 94, "classStatus": [] },
+        { "name": "胡泉", "attendance": 8, "homework": 87, "classStatus": [] },
+        { "name": "李延泽", "attendance": 10, "homework": 92, "classStatus": [] },
+        { "name": "廖雪欣", "attendance": 9, "homework": 85, "classStatus": [] },
+        { "name": "林翠敏", "attendance": 8, "homework": 98, "classStatus": [] },
+        { "name": "林昀熠", "attendance": 10, "homework": 81, "classStatus": [] },
+        { "name": "龙宇海", "attendance": 9, "homework": 90, "classStatus": [] },
+        { "name": "卢晓玲", "attendance": 8, "homework": 99, "classStatus": [] },
+        { "name": "吕振宁", "attendance": 10, "homework": 80, "classStatus": [] },
+        { "name": "郭靖宇", "attendance": 9, "homework": 100, "classStatus": [] }
+    ];
+
+        
+    // 显示当前学生信息
+    function displayData() {
+        const studentsHTML = students.map(student => {
+            return `
+                <div class="student-entry">
+                    <strong>${student.name}</strong>:
+                    出勤: ${student.attendance}次,
+                    作业: ${student.homework}分,
+                    状态: ${student.classStatus.join(', ')}
+                </div>
+            `;
+        }).join(''); 
+
+        document.getElementById('studentData').innerHTML = 
+            '<h3>当前学生数据：</h3>' + 
+            studentsHTML;
+    }
+
+    function markAbsent(studentName) {
+        const student = students.find(s => s.name === studentName);
+        if (student) {
+            student.attendance = Math.max(0, student.attendance - 1); // 减少出勤次数（确保不会小于0 
+            displayData();//更新显示
+        }
+    }
+
+    // 调用AI
+    async function callDeepSeekV3(prompt) {
+        const apiKey = 'sk-96492e7e1d4b422ea7caf9baa39e6981';
+        const endpoint = 'https://api.deepseek.com/v1/chat/completions';
+        const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.7,
+                    max_tokens: 1024,
+                }),
+            });
+        const responseData = await response.json();
+        return responseData.choices[0].message.content.trim();
+    }
+
+      // 智能点名主函数
+      async function startRollCall() {
+          const resultDiv = document.getElementById('result');
+          resultDiv.innerHTML = "正在分析数据...";
+          // 提示词
+          const prompt = `请根据以下学生数据推荐最需要被点名的学生：
+              ${JSON.stringify(students)}
+              
+              请综合考虑以下因素：
+              1. 出勤次数较少的优先
+              2. 作业成绩较低的优先
+              3. 课堂状态数据可能存在问题（如果有）
+              只需返回学生姓名，不要其他说明`;
+          // 返回结果
+          const selectedStudent = await callDeepSeekV3(prompt);
+          // 显示结果
+          if (selectedStudent) {
+              resultDiv.innerHTML = `本次应点名：<strong>${selectedStudent}</strong>
+              <button class="absent" onclick="markAbsent('${selectedStudent}')">标记为缺勤</button>`;
+          } else {
+              resultDiv.innerHTML = "点名失败，请重试";
+          }
+      }
+      // 导出数据（JSON文件）
+      function exportData() {
+          const dataStr = JSON.stringify(students);
+          const blob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'student_data.json'; 
+          a.click();
+      }
+      // 导入数据
+      function importData() {
+          const file = document.getElementById('fileInput').files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              students = JSON.parse(e.target.result);
+              displayData(); 
+          };
+          reader.readAsText(file);
+      }
+      // 页面加载时初始化显示
+      displayData();
+    </script>
 </body>
 </html>
