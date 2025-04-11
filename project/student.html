@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学生端 - 课堂抢答</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    input { padding: 10px; font-size: 1rem; margin: 10px 0; width: 80%; max-width: 300px; }
+    button { padding: 10px 20px; font-size: 1.2rem; background: #21799f; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #status { margin-top: 20px; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>📱 学生抢答</h1>
+  <input id="name-input" type="text" placeholder="输入你的名字" required>
+  <button id="answer-btn" disabled>抢答</button>
+  <div id="status">等待老师开始...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+  <script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA5emNRcKO2Y_5ejo9HtldDIyJI7JUX6so",
+  authDomain: "call-in-class.firebaseapp.com",
+  databaseURL: "https://call-in-class-default-rtdb.firebaseio.com",
+  projectId: "call-in-class",
+  storageBucket: "call-in-class.firebasestorage.app",
+  messagingSenderId: "502723875831",
+  appId: "1:502723875831:web:d757d53709da11fbbc14f2",
+  measurementId: "G-FL73S2M6JR"
+};
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    database.ref("status").on("value", (snapshot) => {
+      const isActive = snapshot.val()==="active";
+      document.getElementById("answer-btn").disabled = !isActive;
+      document.getElementById("status").textContent = isActive ? "可以抢答！" : "等待老师开始...";
+    });
+    document.getElementById("answer-btn").addEventListener("click", () => {
+      const name = document.getElementById("name-input").value.trim();
+      if (!name) return;
+
+      database.ref("answers").push({ name });
+      document.getElementById("answer-btn").disabled = true;
+      document.getElementById("status").textContent = "已抢答！";
+    });
+  </script>
+</body>
+</html>
+
+
