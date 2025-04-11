@@ -188,6 +188,12 @@
       }
       
       roll();
+
+    // 页面加载完成后自动开始滚动
+      window.onload = function() {
+        // setTimeout(startRolling, 500)  // 延迟500毫秒后开始滚动
+        startRolling();
+      }
     }
   </script>
 </body>
