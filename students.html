@@ -207,7 +207,7 @@
 
     // 调用AI
     async function callDeepSeekV3(prompt) {
-        const apiKey = 'sk-96...略';
+        const apiKey = 'sk-96492e7e1d4b422ea7caf9baa39e6981'; //给出api，方便验收
         const endpoint = 'https://api.deepseek.com/v1/chat/completions';
         const response = await fetch(endpoint, {
                 method: 'POST',
@@ -217,10 +217,10 @@
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: "deepseek-chat",
+                    model: "deepseek-chat", //
                     messages: [{ role: "user", content: prompt }],
-                    temperature: 0.7,
-                    max_tokens: 1024,
+                    temperature: 0.7, //调 生成随机性
+                    max_tokens: 1024, //最大tokens数
                 }),
             });
         const responseData = await response.json();
