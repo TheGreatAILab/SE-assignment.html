@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>老师端 - 课堂抢答系统</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    button { padding: 10px 20px; font-size: 1.2rem; background: #4caf70; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #result { font-size: 2rem; margin: 20px 0; color: #ffc422; }
+    #leaderboard { list-style: none; padding: 0; max-width: 500px; margin: 0 auto; }
+    #leaderboard li { display: flex; justify-content: space-between; padding: 8px; background: #f5f5f5; margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>老师端 - 课堂抢答</h1>
+  <button id="start-btn">开始抢答</button>
+  <button id="reset-btn" disabled>重置</button>
+  <div id="result">等待抢答...</div>
+  <h2>🏆抢答排行榜</h2>
+  <ul id="leaderboard"></ul>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+  <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA5emNRcKO2Y_5ejo9HtldDIyJI7JUX6so",
+  authDomain: "call-in-class.firebaseapp.com",
+  databaseURL: "https://call-in-class-default-rtdb.firebaseio.com",
+  projectId: "call-in-class",
+  storageBucket: "call-in-class.firebasestorage.app",
+  messagingSenderId: "502723875831",
+  appId: "1:502723875831:web:d757d53709da11fbbc14f2",
+  measurementId: "G-FL73S2M6JR"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    database.ref("answers").on("value", (snapshot) => {
+      const answers = snapshot.val() || {};
+      const leaderboard = {};
+      
+      Object.values(answers).forEach(answer => {
+        leaderboard[answer.name] = (leaderboard[answer.name] || 0) + 1;
+      });
+
+      const leaderboardList = document.getElementById("leaderboard");
+      leaderboardList.innerHTML = Object.entries(leaderboard)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, count]) => `<li>${name}: ${count} 次</li>`)
+        .join("");
+    });
+
+    document.getElementById("start-btn").addEventListener("click", () => {
+      database.ref("status").set("active");
+      database.ref("answers").remove();
+      document.getElementById("result").textContent = "抢答中...";
+      document.getElementById("reset-btn").disabled = false;
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      database.ref("status").set("inactive");
+      database.ref("answers").remove();
+      document.getElementById("result").textContent = "等待抢答...";
+      document.getElementById("reset-btn").disabled = true;
+    });
+  </script>
+</body>
+</html>
