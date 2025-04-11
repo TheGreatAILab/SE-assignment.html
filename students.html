@@ -23,7 +23,7 @@
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <button onclick="startRolling()">
     点名
   </button>
   <p id="result"></p>
@@ -154,6 +154,41 @@
 "23336170",
 "23336178",
 "23320048"];
+
+    function startRolling() {
+      const resultElement = document.getElementById('result');
+      const btn = document.querySelector("button");
+      
+      // 禁用按钮防止重复点击
+      btn.disabled = true;
+
+      // 设置初始滚动的参数
+      let iteration = 0;
+      let delay = 50; // 初始延时（毫秒）
+      const totalIterations = 20;  // 滚动次数
+      const slowdownFactor = 1.15; // 减速因子
+
+      // 定义递归滚动函数
+      function roll() {
+        iteration++;
+
+        if (iteration < totalIterations) {
+          // 每次随机显示一个学生姓名
+          resultElement.innerText = students[Math.floor(Math.random() * students.length)];
+          // 计算下次更新延时时间
+          delay = delay * slowdownFactor;
+          // 调用下一次滚动
+          setTimeout(roll, delay);
+        } else {
+          // 最后一次显示预先选定的最终姓名
+          resultElement.innerText = students[Math.floor(Math.random() * students.length)];
+          // 恢复按钮状态，允许再次点击
+          btn.disabled = false;
+        }
+      }
+      
+      roll();
+    }
   </script>
 </body>
 </html>
