@@ -20,13 +20,30 @@
       font-size: 2rem;
       margin-top: 1rem;
     }
+    .record {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 300px;
+      height: 100vh;
+      background: white;
+      padding: 20px;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
+  <button onclick="pickStudent()">
     点名
   </button>
   <p id="result"></p>
+
+  <div class="record">
+    <h3>点名记录</h3>
+    <ul id="recordList"></ul>
+  </div>
+  
   <script>
     const students = ["谢慧豪",
 "肖金洋",
@@ -154,6 +171,26 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    
+    const records = {};
+
+    function pickStudent() {
+      const name = students[Math.floor(Math.random() * students.length)];
+      records[name] = (records[name] || 0) + 1;
+      updateDisplay(name);
+    }
+
+    function updateDisplay(name) {
+      document.getElementById('result').textContent = name;
+      
+    const list = document.getElementById('recordList');
+    list.innerHTML = Object.entries(records)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => 
+        `<li><span>${name}</span><span> ${count}次</span></li>`
+      )
+      .join('');
+    }
   </script>
 </body>
 </html>
