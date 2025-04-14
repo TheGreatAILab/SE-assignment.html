@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>随机点名系统</title>
   <style>
     body {
       display: flex;
@@ -11,24 +11,60 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      background: #f0f2f5;
+      font-family: Arial, sans-serif;
     }
     button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      padding: 1rem 3rem;
+      border: none;
+      border-radius: 2rem;
+      background: #2196F3;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      background: #1976D2;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+    }
+    button:disabled {
+      background: #90CAF9;
+      cursor: not-allowed;
+      opacity: 0.8;
     }
     #result {
-      font-size: 2rem;
+      font-size: 3rem;
+      margin: 2rem;
+      padding: 1.5rem 3rem;
+      border: 3px solid #2196F3;
+      border-radius: 15px;
+      min-width: 300px;
+      text-align: center;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+    #counter {
+      color: #666;
       margin-top: 1rem;
+    }
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px rgba(33, 150, 243, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(33, 150, 243, 0.8); }
+      100% { box-shadow: 0 0 10px rgba(33, 150, 243, 0.5); }
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
-  </button>
-  <p id="result"></p>
+  <button id="rollBtn">开始点名</button>
+  <div id="result">准备好啦！</div>
+  <div id="counter">剩余人数：--</div>
+
   <script>
-    const students = ["谢慧豪",
+    const students =["谢慧豪",
 "肖金洋",
 "廖嘉辉",
 "李锐钊",
@@ -154,6 +190,68 @@
 "卢晓玲",
 "吕振宁",
 "郭靖宇"];
+    
+    let remainingStudents = [...students];
+    let isRolling = false;
+    const rollBtn = document.getElementById('rollBtn');
+    const result = document.getElementById('result');
+    const counter = document.getElementById('counter');
+
+    // 初始化剩余人数显示
+    updateCounter();
+
+    rollBtn.addEventListener('click', startRolling);
+
+    function startRolling() {
+      if (isRolling) return;
+      
+      isRolling = true;
+      rollBtn.disabled = true;
+      result.style.animation = 'glow 1s infinite';
+
+      const startTime = Date.now();
+      const duration = 3000; // 动画总时长3秒
+      
+      function update() {
+        const elapsed = Date.now() - startTime;
+        const progress = elapsed / duration;
+
+        if (elapsed < duration) {
+          // 更新显示随机姓名
+          const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+          result.textContent = remainingStudents[randomIndex];
+          // 逐渐减缓速度
+          setTimeout(update, 50 + progress * 150);
+        } else {
+          // 动画结束
+          finishRoll();
+        }
+      }
+
+      update();
+    }
+
+    function finishRoll() {
+      // 检查是否需要重置名单
+      if (remainingStudents.length === 0) {
+        remainingStudents = [...students];
+      }
+
+      // 随机选择并移除已点名学生
+      const finalIndex = Math.floor(Math.random() * remainingStudents.length);
+      const selected = remainingStudents.splice(finalIndex, 1)[0];
+      
+      result.textContent = selected;
+      result.style.animation = '';
+      rollBtn.disabled = false;
+      isRolling = false;
+      
+      updateCounter();
+    }
+
+    function updateCounter() {
+      counter.textContent = `剩余人数：${remainingStudents.length}`;
+    }
   </script>
 </body>
 </html>
