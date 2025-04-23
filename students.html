@@ -2,158 +2,331 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>随机点名</title>
+  <title>智能课堂点名系统</title>
   <style>
     body {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
     }
-    button {
-      font-size: 2rem;
-      padding: 1rem 2rem;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 20px 0;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
     #result {
+      text-align: center;
       font-size: 2rem;
-      margin-top: 1rem;
+      margin: 20px;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .dialog {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .settings-item {
+      margin: 15px 0;
+    }
+
+    .attendance-buttons {
+      margin-top: 20px;
+    }
+
+    .stats {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-  <button onclick="document.getElementById('result').innerText = students[Math.floor(Math.random() * students.length)]">
-    点名
+  <div class="header">
+    <button onclick="showSettings()">学生设置</button>
+    <button onclick="showStats()">考勤统计</button>
+  </div>
+
+  <div class="stats" id="stats">
+    <div>剩余：<span id="remaining">0</span></div>
+    <div>已点：<span id="called">0</span></div>
+  </div>
+
+  <button onclick="pickStudent()" style="margin-top: 50px; padding: 20px 40px; font-size: 1.5rem;">
+    🎉 开始点名
   </button>
-  <p id="result"></p>
-  <script>
-    const students = ["谢慧豪",
-"肖金洋",
-"廖嘉辉",
-"李锐钊",
-"罗斯",
-"沈嘉乐",
-"李佳音",
-"丁烁芝",
-"王宥森",
-"严浩文",
-"赖鼎昭",
-"朱潇瑶",
-"刘盛邦",
-"黄润轩",
-"许梓烁",
-"杨鑫",
-"詹伟翔",
-"章豪斌",
-"钟晨晖",
-"丁奕轩",
-"黄梓城",
-"彭志泓",
-"王阳明",
-"吴承徽",
-"吴佳霖",
-"吴乐超",
-"吴睿",
-"吴深荣",
-"吴玟欣",
-"吴晓恒",
-"吴修远",
-"肖睿",
-"肖添",
-"谢家和",
-"谢润文",
-"熊昊翔",
-"熊彦钧",
-"徐观炼",
-"徐上",
-"徐子欣",
-"许才明",
-"许君兰",
-"闫麟昊",
-"阳文轩",
-"杨凯",
-"杨立新",
-"杨铭昊",
-"杨培凯",
-"杨希凯",
-"杨晓乐",
-"杨正宇",
-"姚书璟",
-"姚宇翔",
-"叶崇杰",
-"游璐玮",
-"于远洋",
-"余俊翰",
-"余鑫",
-"张苇航",
-"元朗曦",
-"袁舜骐",
-"岳峻宇",
-"詹佳烨",
-"张博然",
-"张浩宇",
-"张皓昱",
-"张景翔",
-"张洛瑜",
-"张人心",
-"张若璇",
-"张文坚",
-"张文翔",
-"张相钊",
-"张晔",
-"张逸",
-"张颖琳",
-"张宇然",
-"张玉瑶",
-"张誉方",
-"张越",
-"赵施琦",
-"郑达维",
-"郑浩翔",
-"郑皓",
-"郑晋凯",
-"郑思扬",
-"郑晓丰",
-"郑鑫宇",
-"郑芸熙",
-"职雨欣",
-"钟泓瑨",
-"钟俊喆",
-"钟思玥",
-"钟旺烜",
-"周海铭",
-"周宏杰",
-"周嘉尉",
-"周逸",
-"周雨桐",
-"周梓枫",
-"邹书承",
-"吴永聪",
-"肖淇",
-"徐泓昊",
-"薛炜鹏",
-"张周骁",
-"周子健",
-"常淇博",
-"陈畅",
-"陈大有",
-"陈龙",
-"陈仁培",
-"陈思谋",
-"段玉飞",
-"古康杰",
-"郭延庚",
-"何晓文",
-"胡泉",
-"李延泽",
-"廖雪欣",
-"林翠敏",
-"林昀熠",
-"龙宇海",
-"卢晓玲",
-"吕振宁",
-"郭靖宇"];
-  </script>
+
+  <div id="result">
+    <img class="avatar" id="avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+    <div id="name"></div>
+    <div id="message" style="margin: 20px 0; color: #666;"></div>
+    <div class="attendance-buttons">
+      <button onclick="markAttendance(true)" style="background: #4CAF50;">✅ 已到</button>
+      <button onclick="markAttendance(false)" style="background: #f44336;">❌ 缺勤</button>
+    </div>
+  </div>
+
+  <div id="settingsDialog" class="dialog">
+    <h2>学生个性化设置</h2>
+    <div id="settingsList"></div>
+    <button onclick="closeDialog()" style="margin-top: 20px;">关闭</button>
+  </div>
+
+  <div id="statsDialog" class="dialog">
+    <h2>考勤统计</h2>
+    <div id="statsList"></div>
+  </div>
+
+<script>
+// 初始化学生数据
+const defaultAvatar = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+let students = [
+  {
+    name: "谢慧豪",
+    avatar: defaultAvatar,
+    message: "相信自己，你可以做到的！",
+    called: 0,
+    absences: [],
+    settings: { customAvatar: "", customMessage: "" }
+  },
+  // 其他学生数据...
+].map(s => {
+  const saved = localStorage.getItem(`student_${s.name}`);
+  return saved ? { ...s, ...JSON.parse(saved) } : s;
+});
+
+// 系统状态
+let state = {
+  pool: [...students],
+  called: [],
+  resetFlag: false
+};
+
+// 初始化
+function init() {
+  const savedState = sessionStorage.getItem('state');
+  if(savedState) {
+    const parsed = JSON.parse(savedState);
+    state = {
+      ...parsed,
+      pool: students.filter(s => 
+        parsed.pool.some(p => p.name === s.name)
+      )
+    };
+  }
+  updateStats();
+}
+
+// 点名逻辑
+function pickStudent() {
+  if(state.pool.length === 0) {
+    alert('所有学生都已完成点名！');
+    return;
+  }
+
+  // 加权随机算法
+  const weights = state.pool.map(s => 
+    Math.exp(-s.called * 0.5) * 
+    (1 - s.absences.filter(a => a > Date.now() - 86400000 * 3).length / 5)
+  );
+  const total = weights.reduce((a,b) => a + b, 0);
+  let random = Math.random() * total;
+
+  let index = 0;
+  while(random > weights[index]) {
+    random -= weights[index];
+    index++;
+  }
+
+  const selected = state.pool.splice(index, 1)[0];
+  state.called.push({
+    name: selected.name,
+    time: Date.now()
+  });
+  selected.called++;
+  
+  updateStorage();
+  showResult(selected);
+  checkReset();
+}
+
+// 显示结果
+function showResult(student) {
+  const avatar = student.settings.customAvatar || student.avatar;
+  const message = student.settings.customMessage || student.message;
+  
+  document.getElementById('avatar').src = avatar;
+  document.getElementById('name').innerHTML = `
+    ${student.name} 
+    <small style="color: #666;">（第${student.called}次被点名）</small>
+  `;
+  document.getElementById('message').textContent = message;
+  speak(message);
+}
+
+// 语音播报
+function speak(text) {
+  if('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// 考勤标记
+function markAttendance(present) {
+  const current = state.called[state.called.length -1].name;
+  const student = students.find(s => s.name === current);
+  
+  if(!present) {
+    student.absences.push(Date.now());
+    checkConsecutiveAbsences(student);
+  }
+  
+  updateStorage();
+  updateStats();
+}
+
+// 连续缺勤检查
+function checkConsecutiveAbsences(student) {
+  const absences = student.absences
+    .sort((a,b) => b - a)
+    .map(t => new Date(t).toLocaleDateString());
+  
+  const consecutive = absences
+    .slice(0,3)
+    .every((d,i,a) => i === 0 || d === a[i-1]);
+  
+  if(consecutive && absences.length >= 2) {
+    alert(`注意！${student.name} 已连续缺勤 ${absences.length} 次！`);
+  }
+}
+
+// 设置管理
+function showSettings() {
+  const dialog = document.getElementById('settingsDialog');
+  dialog.style.display = 'block';
+  
+  document.getElementById('settingsList').innerHTML = students.map(s => `
+    <div class="settings-item">
+      <h3>${s.name}</h3>
+      <input type="file" accept="image/*" 
+        onchange="updateAvatar('${s.name}', this)">
+      <textarea onchange="updateMessage('${s.name}', this.value)"
+        placeholder="自定义鼓励语">${s.settings.customMessage}</textarea>
+      <div style="margin-top:10px;">
+        ${s.settings.customAvatar ? 
+          `<img src="${s.settings.customAvatar}" style="height:50px;">` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateAvatar(name, input) {
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    const student = students.find(s => s.name === name);
+    student.settings.customAvatar = e.target.result;
+    localStorage.setItem(`student_${name}`, JSON.stringify(student));
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateMessage(name, text) {
+  const student = students.find(s => s.name === name);
+  student.settings.customMessage = text;
+  localStorage.setItem(`student_${name}`, JSON.stringify(student));
+}
+
+// 统计功能
+function showStats() {
+  const dialog = document.getElementById('statsDialog');
+  dialog.style.display = 'block';
+  
+  const stats = students.map(s => `
+    <div style="margin:10px 0; padding:10px; background:#f8f9fa;">
+      <div>${s.name}</div>
+      <div>点名次数: ${s.called}</div>
+      <div>最近缺勤: ${s.absences.slice(-3).map(d => 
+        new Date(d).toLocaleDateString()).join(', ')}</div>
+    </div>
+  `).join('');
+  
+  document.getElementById('statsList').innerHTML = stats;
+}
+
+// 辅助功能
+function updateStats() {
+  document.getElementById('remaining').textContent = state.pool.length;
+  document.getElementById('called').textContent = state.called.length;
+}
+
+function updateStorage() {
+  sessionStorage.setItem('state', JSON.stringify({
+    ...state,
+    pool: state.pool.map(s => ({ name: s.name })),
+    called: state.called
+  }));
+}
+
+function checkReset() {
+  if(state.pool.length / students.length < 0.3) {
+    if(confirm('剩余人数不足30%，是否重置名单？')) {
+      state.pool = [...students];
+      state.called = [];
+      updateStorage();
+      updateStats();
+    }
+  }
+}
+
+function closeDialog() {
+  document.querySelectorAll('.dialog').forEach(d => d.style.display = 'none');
+}
+
+// 启动系统
+init();
+</script>
 </body>
 </html>
